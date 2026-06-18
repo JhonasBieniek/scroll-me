@@ -11,7 +11,7 @@ describe('validateEnv', () => {
     expect(() =>
       validateEnv({
         DATABASE_URL:
-          'postgresql://scrollme:scrollme@localhost:5432/scrollme_v2',
+          'postgresql://scrollme:scrollme@localhost:5432/scrollme',
         JWT_ACCESS_SECRET: '   ',
         JWT_REFRESH_SECRET: '',
       }),
@@ -20,7 +20,7 @@ describe('validateEnv', () => {
 
   it('returns config when all required vars are present', () => {
     const config = {
-      DATABASE_URL: 'postgresql://scrollme:scrollme@localhost:5432/scrollme_v2',
+      DATABASE_URL: 'postgresql://scrollme:scrollme@localhost:5432/scrollme',
       JWT_ACCESS_SECRET: 'access-secret',
       JWT_REFRESH_SECRET: 'refresh-secret',
     };

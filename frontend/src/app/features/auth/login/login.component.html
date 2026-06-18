@@ -1,0 +1,44 @@
+<app-auth-layout title="Entrar" subtitle="Acesse sua conta.">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label class="field">
+      <span class="field__label">E-mail</span>
+      <input
+        class="field__input"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="voce@dominio.com"
+      />
+      @if (emailControl.touched && emailControl.invalid) {
+        <span class="field__error">Informe um e-mail válido.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Senha</span>
+      <input
+        class="field__input"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        placeholder="••••••••"
+      />
+      @if (passwordControl.touched && passwordControl.invalid) {
+        <span class="field__error">Informe sua senha.</span>
+      }
+    </label>
+
+    @if (serverError()) {
+      <p class="form-error" role="alert">{{ serverError() }}</p>
+    }
+
+    <button class="btn" type="submit" [disabled]="loading()">
+      {{ loading() ? 'Entrando…' : 'Entrar' }}
+    </button>
+  </form>
+
+  <p class="auth-alt">
+    Ainda não tem conta?
+    <a class="auth-alt__link" routerLink="/register">Criar conta</a>
+  </p>
+</app-auth-layout>

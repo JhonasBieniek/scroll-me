@@ -1,4 +1,4 @@
-# scroll-me v2 Frontend — Angular 19
+# scroll-me Frontend — Angular 19
 # Multi-stage: imagem de produção; desenvolvimento local via docker-compose (target development)
 
 FROM node:22-alpine AS base

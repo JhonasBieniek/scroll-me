@@ -1,0 +1,12 @@
+<main class="home">
+  <section class="home__card">
+    <h1 class="home__title">Scroll Me</h1>
+    @if (auth.user(); as user) {
+      <p class="home__greeting">
+        Logado como <strong>{{ user.displayName }}</strong>
+        <span class="home__username">{{ '@' + user.username }}</span>
+      </p>
+    }
+    <button class="btn" type="button" (click)="logout()">Sair</button>
+  </section>
+</main>

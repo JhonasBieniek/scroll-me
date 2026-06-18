@@ -1,0 +1,55 @@
+.home {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #000;
+  color: #fafafa;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.home__card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: #121212;
+  border: 1px solid #262626;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.home__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.home__greeting {
+  margin: 0;
+  color: #a8a8a8;
+  line-height: 1.5;
+}
+
+.home__username {
+  display: block;
+  color: #fafafa;
+  font-size: 0.875rem;
+}
+
+.btn {
+  padding: 0.75rem;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #fafafa;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: #ed4956;
+  color: #ed4956;
+}

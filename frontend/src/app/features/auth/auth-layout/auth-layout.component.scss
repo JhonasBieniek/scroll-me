@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.auth {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #000;
+  color: #fafafa;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: #121212;
+  border: 1px solid #262626;
+  border-radius: 12px;
+}
+
+.auth__logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.auth__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auth__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.auth__subtitle {
+  margin: 0;
+  color: #a8a8a8;
+  font-size: 0.875rem;
+}

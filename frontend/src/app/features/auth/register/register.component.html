@@ -1,0 +1,90 @@
+<app-auth-layout title="Criar conta" subtitle="Comece a usar o Scroll Me.">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label class="field">
+      <span class="field__label">Nome de usuário</span>
+      <input
+        class="field__input"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        placeholder="seu_usuario"
+      />
+      @if (usernameControl.touched && usernameControl.invalid) {
+        <span class="field__error">3 a 30 caracteres: letras, números, _ ou .</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Nome de exibição</span>
+      <input
+        class="field__input"
+        type="text"
+        formControlName="displayName"
+        autocomplete="name"
+        placeholder="Seu nome"
+      />
+      @if (displayNameControl.touched && displayNameControl.invalid) {
+        <span class="field__error">Informe um nome de exibição.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">E-mail</span>
+      <input
+        class="field__input"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="voce@dominio.com"
+      />
+      @if (emailControl.touched && emailControl.invalid) {
+        <span class="field__error">Informe um e-mail válido.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Senha</span>
+      <input
+        class="field__input"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        placeholder="Mínimo 8 caracteres"
+      />
+      @if (passwordControl.touched && passwordControl.invalid) {
+        <span class="field__error">A senha deve ter ao menos 8 caracteres.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Confirmar senha</span>
+      <input
+        class="field__input"
+        type="password"
+        formControlName="confirmPassword"
+        autocomplete="new-password"
+        placeholder="Repita a senha"
+      />
+      @if (confirmControl.touched && confirmControl.invalid) {
+        <span class="field__error">Informe a confirmação da senha.</span>
+      }
+    </label>
+
+    @if (showMismatch()) {
+      <p class="form-error" role="alert">As senhas não coincidem.</p>
+    }
+
+    @if (serverError()) {
+      <p class="form-error" role="alert">{{ serverError() }}</p>
+    }
+
+    <button class="btn" type="submit" [disabled]="loading()">
+      {{ loading() ? 'Criando…' : 'Criar conta' }}
+    </button>
+  </form>
+
+  <p class="auth-alt">
+    Já tem conta?
+    <a class="auth-alt__link" routerLink="/login">Entrar</a>
+  </p>
+</app-auth-layout>

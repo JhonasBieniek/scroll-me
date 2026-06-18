@@ -25,6 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://scrollme:scrollme@localhost:5432/scrollme
+
       - name: Lint
         run: npm run lint
 
@@ -33,6 +38,10 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          DATABASE_URL: postgresql://scrollme:scrollme@localhost:5432/scrollme
+          JWT_ACCESS_SECRET: ci_access_secret
+          JWT_REFRESH_SECRET: ci_refresh_secret
 
   frontend:
     runs-on: ubuntu-latest

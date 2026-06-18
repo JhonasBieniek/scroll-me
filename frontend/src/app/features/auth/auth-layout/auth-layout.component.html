@@ -1,0 +1,16 @@
+<main class="auth">
+  <section class="auth__card">
+    <header class="auth__brand">
+      <span class="auth__logo">Scroll Me</span>
+    </header>
+
+    <div class="auth__head">
+      <h1 class="auth__title">{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="auth__subtitle">{{ subtitle() }}</p>
+      }
+    </div>
+
+    <ng-content />
+  </section>
+</main>
