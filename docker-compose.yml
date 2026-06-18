@@ -1,0 +1,90 @@
+# Desenvolvimento local — NestJS + Angular + PostgreSQL (scroll-me v2)
+# Uso: docker compose up --build
+#
+# API_BASE_URL no frontend: o browser roda no host, então chamadas HTTP saem do
+# navegador (localhost), não da rede Docker. Use http://localhost:${API_PORT} —
+# nunca http://api:3000 (só resolve dentro dos containers).
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: scroll-me-v2-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-scrollme}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scrollme}
+      POSTGRES_DB: ${POSTGRES_DB:-scrollme_v2}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - scroll_me_v2_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-scrollme} -d ${POSTGRES_DB:-scrollme_v2}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: scroll-me-v2-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-scrollme}:${POSTGRES_PASSWORD:-scrollme}@db:5432/${POSTGRES_DB:-scrollme_v2}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev_access_secret_change_me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev_refresh_secret_change_me}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-7d}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:4200}
+      UPLOAD_TMP_DIR: /tmp/uploads
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      PRESIGNED_URL_TTL: ${PRESIGNED_URL_TTL:-1800}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_BUCKET: ${R2_BUCKET:-scroll-me-media}
+    command: npm run start:dev
+    volumes:
+      - ./backend:/app
+      - scroll_me_v2_api_node_modules:/app/node_modules
+      - scroll_me_v2_upload_tmp:/tmp/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: scroll-me-v2-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-4200}:4200"
+    environment:
+      NODE_ENV: development
+      # sync-env.mjs lê API_BASE_URL da env ou .env na raiz; browser acessa API via host
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:${API_PORT:-3000}}
+    command: npm run start -- --host 0.0.0.0 --poll 2000
+    volumes:
+      - ./frontend:/app
+      - scroll_me_v2_frontend_node_modules:/app/node_modules
+    depends_on:
+      - api
+
+volumes:
+  scroll_me_v2_pg_data:
+  scroll_me_v2_api_node_modules:
+  scroll_me_v2_upload_tmp:
+  scroll_me_v2_frontend_node_modules:

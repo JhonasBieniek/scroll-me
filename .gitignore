@@ -1,0 +1,32 @@
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Dependências e builds
+node_modules/
+dist/
+backend/dist/
+frontend/dist/
+coverage/
+
+# Logs e artefatos locais
+*.log
+npm-debug.log*
+cookies.txt
+.DS_Store
+
+# Angular / Nest
+frontend/.angular/
+*.tsbuildinfo
+
+# IDE (opcional — remova se quiser versionar settings de equipe)
+.idea/
+.vscode/
+*.swp
+
+# Testes / uploads locais acidentais
+/tmp/
+uploads/
+*.mp4
+!**/test/fixtures/**/*.mp4
