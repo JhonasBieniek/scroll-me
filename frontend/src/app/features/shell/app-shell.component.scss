@@ -1,0 +1,65 @@
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.shell__column {
+  position: relative;
+  width: 100%;
+  max-width: var(--shell-max);
+  min-height: 100dvh;
+  background: var(--bg);
+  border-inline: 1px solid var(--border);
+}
+
+.shell__file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shell__nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--shell-max);
+  height: var(--nav-height);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 var(--space-6);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: rgba(18, 18, 18, 0.96);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  z-index: 20;
+}
+
+.shell__nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  justify-self: center;
+  color: var(--text-secondary);
+  transition: color 150ms ease, transform 120ms ease;
+}
+
+.shell__nav-btn--active {
+  color: var(--text);
+}
+
+.shell__nav-btn--create {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--text);
+  color: var(--text);
+}

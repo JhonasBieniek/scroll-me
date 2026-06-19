@@ -1,0 +1,60 @@
+// Scroll Me — Instagram dark tokens
+
+:root {
+  --bg: #000000;
+  --surface: #121212;
+  --surface-raised: #1a1a1a;
+  --border: #262626;
+  --text: #fafafa;
+  --text-secondary: #a8a8a8;
+  --text-muted: #737373;
+  --link: #0095f6;
+  --danger: #ed4956;
+  --overlay: rgba(0, 0, 0, 0.45);
+
+  --accent: var(--link);
+  --accent-strong: #1aa3ff;
+  --accent-ink: #ffffff;
+  --live: var(--danger);
+
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-body);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --weight-regular: 400;
+  --weight-medium: 600;
+  --weight-display: 700;
+  --tracking-display: -0.01em;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --shell-max: 430px;
+  --nav-height: 56px;
+  --nav-offset: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  --content-height: calc(100dvh - var(--nav-offset));
+
+  --motion-fast: 140ms ease;
+
+  color-scheme: dark;
+}

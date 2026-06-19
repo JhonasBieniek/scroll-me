@@ -1,0 +1,87 @@
+:host {
+  display: block;
+  height: var(--content-height);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.card {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.card__player {
+  position: absolute;
+  inset: 0;
+}
+
+.card__badge {
+  position: absolute;
+  top: var(--space-12);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+  background: var(--overlay);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  z-index: 3;
+}
+
+.card__actions {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-8);
+  z-index: 2;
+}
+
+.action {
+  display: flex;
+  color: var(--text);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.card__overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: var(--space-6) var(--space-16) var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.75) 0%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.card__author {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text);
+}
+
+.card__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.card__username {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-display);
+}
+
+.card__caption {
+  font-size: var(--text-sm);
+  max-width: calc(100% - var(--space-2));
+  line-height: 1.35;
+}

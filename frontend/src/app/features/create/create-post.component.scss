@@ -1,0 +1,147 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--bg);
+}
+
+.create__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.create__close {
+  font-size: 1.6rem;
+  width: 32px;
+  height: 32px;
+}
+
+.create__title {
+  font-weight: var(--weight-display);
+}
+
+.create__spacer {
+  width: 32px;
+}
+
+.create {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-4);
+  gap: var(--space-6);
+  overflow-y: auto;
+}
+
+.create__error {
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.picker {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  padding: var(--space-8);
+}
+
+.picker__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.picker__hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.preview {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  background: #000;
+  border-radius: var(--radius-md);
+}
+
+.preview__video {
+  width: 100%;
+  max-height: 60dvh;
+}
+
+.create__footer {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.btn {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: var(--weight-medium);
+}
+
+.btn--primary {
+  background: var(--link);
+  color: #fff;
+}
+
+.btn--ghost {
+  border: 1px solid var(--border);
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.caption__video {
+  width: 100%;
+  max-height: 38dvh;
+  background: #000;
+  border-radius: var(--radius-md);
+}
+
+.caption__textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+}
+
+.progress__track {
+  width: 80%;
+  max-width: 320px;
+  height: 6px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.progress {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}

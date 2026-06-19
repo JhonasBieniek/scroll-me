@@ -4,7 +4,7 @@ import { authGuard } from './core/auth/auth.guard';
 import { guestGuard } from './core/auth/guest.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { HomeComponent } from './features/home/home.component';
+import { AppShellComponent } from './features/shell/app-shell.component';
 
 const routes: Routes = [
   {
@@ -24,7 +24,7 @@ const routes: Routes = [
     path: '',
     title: 'Scroll Me',
     canActivate: [authGuard],
-    component: HomeComponent,
+    component: AppShellComponent,
   },
   { path: '**', redirectTo: '' },
 ];

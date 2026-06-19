@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -45,5 +45,8 @@ async function bootstrap(): Promise<void> {
 
   const port = Number(process.env.PORT ?? 3000);
   await app.listen(port);
+
+  const logger = new Logger('Bootstrap');
+  logger.log(`API ouvindo em http://0.0.0.0:${port} (logs de requisição: HTTP)`);
 }
 void bootstrap();

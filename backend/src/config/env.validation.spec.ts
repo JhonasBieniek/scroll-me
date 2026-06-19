@@ -10,8 +10,7 @@ describe('validateEnv', () => {
   it('fails when JWT secrets are blank', () => {
     expect(() =>
       validateEnv({
-        DATABASE_URL:
-          'postgresql://scrollme:scrollme@localhost:5432/scrollme',
+        DATABASE_URL: 'postgresql://scrollme:scrollme@localhost:5432/scrollme',
         JWT_ACCESS_SECRET: '   ',
         JWT_REFRESH_SECRET: '',
       }),

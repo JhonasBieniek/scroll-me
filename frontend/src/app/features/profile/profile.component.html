@@ -1,0 +1,29 @@
+<header class="profile__bar">
+  <h1 class="profile__handle">
+    {{ profile ? '@' + profile.username : 'Perfil' }}
+  </h1>
+</header>
+
+@if (loading) {
+  <div class="profile__state">
+    <span class="profile__spinner" aria-hidden="true"></span>
+  </div>
+} @else if (profile) {
+  <section class="profile">
+    <div class="profile__top">
+      <span class="profile__avatar">
+        <app-avatar [src]="profile.avatarUrl" [alt]="profile.displayName" />
+      </span>
+      <div class="profile__identity">
+        <p class="profile__name">{{ profile.displayName }}</p>
+        @if (profile.bio) {
+          <p class="profile__bio">{{ profile.bio }}</p>
+        }
+      </div>
+    </div>
+  </section>
+} @else if (error) {
+  <div class="profile__state">
+    <p>{{ error }}</p>
+  </div>
+}

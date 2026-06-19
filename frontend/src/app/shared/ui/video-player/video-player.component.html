@@ -1,0 +1,40 @@
+<div class="player">
+  <video
+    #video
+    class="player__video"
+    playsinline
+    loop
+    preload="none"
+    (click)="togglePlay()"
+  ></video>
+
+  @if (buffering && !failed) {
+    <span class="player__buffer" aria-hidden="true"></span>
+  }
+
+  @if (userPaused && !failed) {
+    <button
+      type="button"
+      class="player__toggle"
+      aria-label="Reproduzir"
+      (click)="togglePlay()"
+    >
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+        <path fill="currentColor" d="M8 5v14l11-7z" />
+      </svg>
+    </button>
+  }
+
+  @if (active && !failed) {
+    <div class="player__progress" aria-hidden="true">
+      <div class="player__progress-fill" [style.width.%]="progress * 100"></div>
+    </div>
+  }
+
+  @if (failed) {
+    <p class="player__error" role="status">
+      Não foi possível carregar o vídeo agora.
+    </p>
+  }
+</div>
+

@@ -25,5 +25,22 @@ model User {
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @map("created_at")
 
+  posts Post[]
+
   @@map("users")
+}
+
+model Post {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  caption          String   @default("")
+  videoManifestUrl String   @map("video_manifest_url")
+  thumbnailKey     String?  @map("thumbnail_key")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("posts")
 }

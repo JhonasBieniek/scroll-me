@@ -1,6 +1,9 @@
 # Desenvolvimento local — NestJS + Angular + PostgreSQL (scroll-me)
 # Uso: docker compose up --build
 #
+# Logs da API (upload, auth, R2): docker compose logs -f api
+# O terminal do frontend só mostra ng serve — requisições HTTP aparecem no api.
+#
 # API_BASE_URL no frontend: o browser roda no host, então chamadas HTTP saem do
 # navegador (localhost), não da rede Docker. Use http://localhost:${API_PORT} —
 # nunca http://api:3000 (só resolve dentro dos containers).

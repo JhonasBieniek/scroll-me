@@ -1,0 +1,85 @@
+<header class="create__bar">
+  <button type="button" class="create__close" aria-label="Cancelar" (click)="cancel()">
+    ×
+  </button>
+  <span class="create__title">Nova publicação</span>
+  <span class="create__spacer" aria-hidden="true"></span>
+</header>
+
+<main class="create">
+  @switch (step) {
+    @case ('pick') {
+      <label class="picker">
+        <span class="picker__icon" aria-hidden="true">＋</span>
+        <span class="picker__label">Selecionar vídeo</span>
+        <span class="picker__hint">Apenas .mp4 · até 50&nbsp;MB</span>
+        <input
+          class="picker__input"
+          type="file"
+          accept="video/mp4,.mp4"
+          (change)="onFileChange($event)"
+        />
+      </label>
+      @if (error) {
+        <p class="create__error" role="alert">{{ error }}</p>
+      }
+    }
+
+    @case ('preview') {
+      <div class="preview">
+        <video class="preview__video" [src]="previewUrl ?? ''" controls playsinline></video>
+      </div>
+      <div class="create__footer">
+        <button type="button" class="btn btn--ghost" (click)="reset()">Trocar vídeo</button>
+        <button type="button" class="btn btn--primary" (click)="goToCaption()">Avançar</button>
+      </div>
+    }
+
+    @case ('caption') {
+      <form class="caption" (ngSubmit)="publish()">
+        @if (previewUrl) {
+          <video
+            class="caption__video"
+            [src]="previewUrl"
+            muted
+            playsinline
+            loop
+            autoplay
+          ></video>
+        }
+        <label class="caption__field">
+          <span class="caption__label">Legenda (opcional)</span>
+          <textarea
+            class="caption__textarea"
+            [formControl]="captionControl"
+            rows="3"
+            maxlength="2200"
+            placeholder="Escreva uma legenda…"
+          ></textarea>
+        </label>
+        @if (error) {
+          <p class="create__error" role="alert">{{ error }}</p>
+        }
+        <button type="submit" class="btn btn--primary">Publicar</button>
+      </form>
+    }
+
+    @case ('uploading') {
+      <div class="progress">
+        <p class="progress__label">Publicando… {{ progress }}%</p>
+        <div class="progress__track">
+          <div class="progress__fill" [style.width.%]="progress"></div>
+        </div>
+        @if (error) {
+          <p class="create__error" role="alert">{{ error }}</p>
+        }
+      </div>
+    }
+
+    @case ('done') {
+      <div class="progress">
+        <p class="progress__label">Publicado! ✓</p>
+      </div>
+    }
+  }
+</main>

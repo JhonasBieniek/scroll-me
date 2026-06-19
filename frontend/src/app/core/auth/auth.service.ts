@@ -56,6 +56,11 @@ export class AuthService {
       .pipe(tap(() => this.clearSession()));
   }
 
+  /** Usado pelo interceptor quando refresh falha (sessão inválida). */
+  clearSessionForExpiredAuth(): void {
+    this.clearSession();
+  }
+
   private setSession(res: AuthResponse): void {
     this.accessTokenSig.set(res.accessToken);
     this.userSig.set(res.user);

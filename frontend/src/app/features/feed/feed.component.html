@@ -1,0 +1,34 @@
+<header class="feed__bar">
+  <span class="feed__brand">Scroll Me</span>
+</header>
+
+<main class="feed">
+  @if (loading && posts.length === 0) {
+    <div class="feed__state">
+      <span class="feed__spinner" aria-hidden="true"></span>
+    </div>
+  } @else if (posts.length === 0) {
+    <div class="feed__state">
+      <h1 class="feed__empty-title">Nada por aqui ainda</h1>
+      <p class="feed__empty-text">
+        Publique seu primeiro vídeo para começar.
+      </p>
+    </div>
+  } @else {
+    @for (post of posts; track post.id; let i = $index) {
+      <app-video-card
+        [post]="post"
+        [active]="i === activeIndex"
+        [preload]="i === activeIndex + 1"
+        [muted]="muted"
+        [badge]="i === suggestionsIndex ? 'Sugestões para você' : null"
+        (toggleMuted)="toggleMute()"
+      />
+    }
+    @if (loading) {
+      <div class="feed__more">
+        <span class="feed__spinner" aria-hidden="true"></span>
+      </div>
+    }
+  }
+</main>

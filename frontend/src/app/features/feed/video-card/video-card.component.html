@@ -1,0 +1,59 @@
+<article class="card">
+  <app-video-player
+    class="card__player"
+    [src]="manifestSrc"
+    [active]="active"
+    [muted]="muted"
+    (fatalError)="onPlayerError()"
+  />
+
+  @if (badge) {
+    <span class="card__badge">{{ badge }}</span>
+  }
+
+  <aside class="card__actions">
+    <button
+      type="button"
+      class="action action--sound"
+      [attr.aria-pressed]="muted"
+      [attr.aria-label]="muted ? 'Ativar som' : 'Silenciar'"
+      (click)="onToggleMuted()"
+    >
+      @if (muted) {
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+          <path fill="currentColor" d="M11 5 6 9H2v6h4l5 4V5z" />
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            d="m16 9 5 5m0-5-5 5"
+          />
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+          <path fill="currentColor" d="M11 5 6 9H2v6h4l5 4V5z" />
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12"
+          />
+        </svg>
+      }
+    </button>
+  </aside>
+
+  <div class="card__overlay">
+    <div class="card__author">
+      <span class="card__avatar">
+        <app-avatar [src]="post.author.avatarUrl" [alt]="post.author.displayName" />
+      </span>
+      <span class="card__username">&#64;{{ post.author.username }}</span>
+    </div>
+    @if (post.caption) {
+      <p class="card__caption">{{ post.caption }}</p>
+    }
+  </div>
+</article>
