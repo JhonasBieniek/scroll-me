@@ -1,9 +1,11 @@
-import { PostsService } from '../posts/posts.service';
+﻿import { PostsService } from '../posts/posts.service';
 import { FeedService } from './feed.service';
 
 describe('FeedService', () => {
   it('following retorna vazio sem tabela Follow', async () => {
-    const posts = { list: jest.fn() };
+    const posts: jest.Mocked<Pick<PostsService, 'list'>> = {
+      list: jest.fn(),
+    };
     const service = new FeedService(posts as unknown as PostsService);
 
     const page = await service.following('user-1', {});
@@ -13,7 +15,7 @@ describe('FeedService', () => {
   });
 
   it('discover inclui posts do viewer', async () => {
-    const posts = {
+    const posts: jest.Mocked<Pick<PostsService, 'list'>> = {
       list: jest.fn().mockResolvedValue({ items: [], nextCursor: null }),
     };
     const service = new FeedService(posts as unknown as PostsService);
@@ -23,8 +25,7 @@ describe('FeedService', () => {
     expect(posts.list).toHaveBeenCalledWith(
       expect.objectContaining({ take: 5, excludePostIds: [] }),
     );
-    expect(posts.list).toHaveBeenCalledWith(
-      expect.not.objectContaining({ excludeUserId: expect.anything() }),
-    );
+    const listArg = posts.list.mock.calls[0][0];
+    expect(listArg).not.toHaveProperty('excludeUserId');
   });
 });
