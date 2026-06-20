@@ -14,3 +14,9 @@ export interface UserProfile {
   isMe: boolean;
   isFollowing: boolean;
 }
+
+export interface UpdateProfilePayload {
+  displayName?: string;
+  bio?: string;
+  username?: string;
+}

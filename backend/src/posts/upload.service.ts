@@ -11,12 +11,14 @@ import { ConfigService } from '@nestjs/config';
 import { Post } from '@prisma/client';
 import { MediaService } from '../media/media.service';
 import { StorageService } from '../storage/storage.service';
-import { assertPathUnderRoot } from '../common/safe-path';
+import { resolvePathUnderRootFromBasename } from '../common/safe-path';
 import { resolveUploadTmpDir } from './upload.config';
 import { CreatePostInput, PostsService } from './posts.service';
 
 export interface UploadedFile {
   path: string;
+  /** Nome gerado pelo multer em disco (basename confiável para limpeza). */
+  filename: string;
   originalname: string;
   size: number;
 }
@@ -85,19 +87,22 @@ export class UploadService {
         'Não foi possível processar o vídeo enviado.',
       );
     } finally {
-      await this.cleanup(input.file.path, jobDir);
+      await this.cleanup(input.file.filename, postId);
     }
   }
 
-  private async cleanup(originalPath: string, jobDir: string): Promise<void> {
+  private async cleanup(uploadFilename: string, postId: string): Promise<void> {
     const tmpRoot = resolveUploadTmpDir(
       this.config.get<string>('UPLOAD_TMP_DIR'),
     );
-    const safeOriginalPath = assertPathUnderRoot(tmpRoot, originalPath);
-    const safeJobDir = assertPathUnderRoot(tmpRoot, jobDir);
+    const safeUploadPath = resolvePathUnderRootFromBasename(
+      tmpRoot,
+      uploadFilename,
+    );
+    const jobDir = join(tmpRoot, postId);
     await Promise.allSettled([
-      rm(safeOriginalPath, { force: true }),
-      rm(safeJobDir, { recursive: true, force: true }),
+      rm(safeUploadPath, { force: true }),
+      rm(jobDir, { recursive: true, force: true }),
     ]).then((results) => {
       for (const result of results) {
         if (result.status === 'rejected') {

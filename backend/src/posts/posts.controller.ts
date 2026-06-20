@@ -73,6 +73,7 @@ export class PostsController {
     const post = await this.uploads.process({
       file: {
         path: file.path,
+        filename: file.filename,
         originalname: file.originalname,
         size: file.size,
       },

@@ -1,0 +1,76 @@
+<div class="backdrop" (click)="close()"></div>
+<div class="modal" role="dialog" aria-modal="true" aria-label="Editar perfil">
+  <header class="modal__head">
+    <h2 class="modal__title">Editar perfil</h2>
+    <button type="button" class="modal__close" aria-label="Fechar" (click)="close()">
+      ×
+    </button>
+  </header>
+
+  <form class="modal__form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <label class="avatar-pick">
+      <span class="avatar-pick__img">
+        <app-avatar [src]="avatarPreview" alt="Avatar" />
+      </span>
+      <span class="avatar-pick__text">Alterar foto</span>
+      <input
+        class="avatar-pick__input"
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        (change)="onAvatarChange($event)"
+      />
+    </label>
+
+    <label class="modal__field">
+      <span class="modal__label">Nome de exibição</span>
+      <input
+        class="modal__input"
+        type="text"
+        formControlName="displayName"
+        maxlength="64"
+        placeholder="Seu nome"
+      />
+    </label>
+
+    <label class="modal__field">
+      <span class="modal__label">Nome de usuário</span>
+      <input
+        class="modal__input"
+        type="text"
+        formControlName="username"
+        maxlength="30"
+        placeholder="seu_usuario"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+    </label>
+
+    <label class="modal__field">
+      <span class="modal__label">Bio</span>
+      <textarea
+        class="modal__textarea"
+        formControlName="bio"
+        rows="3"
+        maxlength="150"
+        placeholder="Fale um pouco sobre você…"
+      ></textarea>
+    </label>
+
+    @if (error) {
+      <p class="modal__error" role="alert">{{ error }}</p>
+    }
+
+    <div class="modal__actions">
+      <button type="button" class="modal__btn modal__btn--ghost" (click)="close()">
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="modal__btn modal__btn--primary"
+        [disabled]="saving"
+      >
+        {{ saving ? 'Salvando…' : 'Salvar' }}
+      </button>
+    </div>
+  </form>
+</div>

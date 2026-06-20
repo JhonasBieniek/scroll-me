@@ -1,7 +1,42 @@
 <header class="profile__bar">
+  @if (shell.profileUsername()) {
+    <button
+      type="button"
+      class="profile__back"
+      aria-label="Voltar"
+      (click)="goBack()"
+    >
+      ‹
+    </button>
+  } @else {
+    <span class="profile__spacer" aria-hidden="true"></span>
+  }
+
   <h1 class="profile__handle">
     {{ profile ? '@' + profile.username : 'Perfil' }}
   </h1>
+
+  @if (profile?.isMe) {
+    <button
+      type="button"
+      class="profile__logout"
+      aria-label="Sair"
+      (click)="logout()"
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"
+        />
+      </svg>
+    </button>
+  } @else {
+    <span class="profile__spacer" aria-hidden="true"></span>
+  }
 </header>
 
 @if (loading) {
@@ -37,8 +72,12 @@
       }
     </div>
 
-    @if (!profile.isMe) {
-      <div class="profile__actions">
+    <div class="profile__actions">
+      @if (profile.isMe) {
+        <button type="button" class="profile__edit" (click)="openEdit()">
+          Editar perfil
+        </button>
+      } @else {
         <button
           type="button"
           class="profile__follow"
@@ -48,7 +87,35 @@
         >
           {{ profile.isFollowing ? 'Seguindo' : 'Seguir' }}
         </button>
-      </div>
+      }
+    </div>
+
+    @if (posts.length > 0) {
+      <ul class="grid">
+        @for (post of posts; track post.id) {
+          <li class="grid__cell">
+            <button
+              type="button"
+              class="grid__btn"
+              (click)="openReel(post)"
+              [attr.aria-label]="'Abrir publicação'"
+            >
+              @if (post.thumbnailUrl) {
+                <img
+                  class="grid__img"
+                  [src]="post.thumbnailUrl"
+                  [alt]="post.caption || 'Publicação'"
+                  loading="lazy"
+                />
+              } @else {
+                <span class="grid__placeholder" aria-hidden="true">▶</span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="profile__empty">Nenhuma publicação ainda.</p>
     }
   </section>
 } @else if (error) {

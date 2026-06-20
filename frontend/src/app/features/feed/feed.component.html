@@ -20,7 +20,7 @@
         [post]="post"
         [active]="i === activeIndex"
         [preload]="i === activeIndex + 1"
-        [muted]="muted"
+        [muted]="shell.feedMuted()"
         [badge]="i === suggestionsIndex ? 'Sugestões para você' : null"
         (toggleMuted)="toggleMute()"
       />

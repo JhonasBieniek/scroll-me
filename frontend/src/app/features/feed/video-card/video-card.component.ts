@@ -108,12 +108,32 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
   }
 
   openProfile(): void {
-    this.shell.openUserProfile(this.post.author.username);
+    const reel = this.shell.profileReel();
+    if (reel) {
+      this.shell.openUserProfile(this.post.author.username, {
+        type: 'reel',
+        username: reel.username,
+        startPostId: reel.startPostId,
+      });
+      return;
+    }
+    this.shell.openUserProfile(this.post.author.username, { type: 'feed' });
   }
 
   openCommentAuthorProfile(username: string): void {
-    this.closeComments();
-    this.shell.openUserProfile(username);
+    const reel = this.shell.profileReel();
+    if (reel) {
+      this.shell.openUserProfile(username, {
+        type: 'reel',
+        username: reel.username,
+        startPostId: reel.startPostId,
+      });
+      return;
+    }
+    this.shell.openUserProfile(username, {
+      type: 'comments',
+      postId: this.post.id,
+    });
   }
 
   toggleLike(): void {

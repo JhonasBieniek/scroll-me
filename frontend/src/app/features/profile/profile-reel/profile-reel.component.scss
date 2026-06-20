@@ -1,0 +1,66 @@
+:host {
+  // Nav is hidden while the reel is open — cards must fill the full viewport,
+  // not --content-height (which reserves space for the bottom nav).
+  --content-height: 100dvh;
+
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  z-index: 30;
+  display: block;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  border-inline: 1px solid var(--border);
+}
+
+.reel__bar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  z-index: 6;
+  background: linear-gradient(to bottom, var(--overlay), transparent);
+  pointer-events: none;
+}
+
+.reel__bar > * {
+  pointer-events: auto;
+}
+
+.reel__back {
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+}
+
+.reel__title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-display);
+  color: var(--text);
+}
+
+.reel__spacer {
+  width: 36px;
+}
+
+.reel {
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.reel::-webkit-scrollbar {
+  display: none;
+}

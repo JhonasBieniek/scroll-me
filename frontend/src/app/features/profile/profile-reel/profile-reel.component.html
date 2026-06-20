@@ -1,0 +1,24 @@
+<header class="reel__bar">
+  <button
+    type="button"
+    class="reel__back"
+    aria-label="Voltar"
+    (click)="close()"
+  >
+    ‹
+  </button>
+  <span class="reel__title">Publicações</span>
+  <span class="reel__spacer" aria-hidden="true"></span>
+</header>
+
+<main class="reel">
+  @for (post of posts; track post.id; let i = $index) {
+    <app-video-card
+      [post]="post"
+      [active]="i === activeIndex"
+      [preload]="i === activeIndex + 1"
+      [muted]="shell.feedMuted()"
+      (toggleMuted)="toggleMute()"
+    />
+  }
+</main>

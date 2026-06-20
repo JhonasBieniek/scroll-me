@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from '../api.config';
+import { ShellState } from '../shell/shell.state';
 import {
   AuthResponse,
   AuthUser,
@@ -13,6 +14,7 @@ import {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
+  private readonly shell = inject(ShellState);
 
   private readonly accessTokenSig = signal<string | null>(null);
   private readonly userSig = signal<AuthUser | null>(null);
@@ -67,6 +69,7 @@ export class AuthService {
   }
 
   private clearSession(): void {
+    this.shell.resetFeedMutedPreference();
     this.accessTokenSig.set(null);
     this.userSig.set(null);
   }

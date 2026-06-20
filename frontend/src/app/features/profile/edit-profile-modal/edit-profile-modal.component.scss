@@ -1,0 +1,144 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.modal__title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-display);
+}
+
+.modal__close {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--text);
+}
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.avatar-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.avatar-pick__img {
+  width: 88px;
+  height: 88px;
+  display: block;
+}
+
+.avatar-pick__text {
+  font-size: var(--text-sm);
+  color: var(--accent);
+  font-weight: var(--weight-medium);
+}
+
+.avatar-pick__input {
+  display: none;
+}
+
+.modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.modal__label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.modal__input,
+.modal__textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+}
+
+.modal__input {
+  min-height: 44px;
+}
+
+.modal__textarea {
+  resize: vertical;
+}
+
+.modal__input:focus-visible,
+.modal__textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.modal__error {
+  font-size: var(--text-sm);
+  color: var(--live);
+}
+
+.modal__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.modal__btn {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-md);
+}
+
+.modal__btn--ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.modal__btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.modal__btn--primary:disabled {
+  opacity: 0.6;
+}

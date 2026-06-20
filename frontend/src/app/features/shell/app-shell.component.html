@@ -1,6 +1,8 @@
 <div class="shell">
   <div class="shell__column">
-    @if (state.tab() === 'feed') {
+    @if (state.profileReel(); as reel) {
+      <app-profile-reel />
+    } @else if (state.tab() === 'feed') {
       <app-feed />
     } @else if (state.tab() === 'create') {
       <app-create-post />
@@ -8,7 +10,7 @@
       <app-profile />
     }
 
-    @if (state.tab() !== 'create') {
+    @if (state.tab() !== 'create' && !state.profileReel()) {
       <nav class="shell__nav" aria-label="Navegação principal">
         <button
           type="button"
@@ -75,6 +77,10 @@
           </svg>
         </button>
       </nav>
+    }
+
+    @if (state.editProfileOpen()) {
+      <app-edit-profile-modal />
     }
   </div>
 </div>

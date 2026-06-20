@@ -6,7 +6,10 @@ import {
   inject,
   OnDestroy,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../core/auth/auth.service';
+import { PostSummary } from '../../core/posts/posts.models';
 import { ShellState } from '../../core/shell/shell.state';
 import { UserProfile } from '../../core/users/users.models';
 import { UsersService } from '../../core/users/users.service';
@@ -20,15 +23,19 @@ import { UsersService } from '../../core/users/users.service';
 })
 export class ProfileComponent implements OnDestroy {
   private readonly users = inject(UsersService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   protected readonly shell = inject(ShellState);
   private readonly cdr = inject(ChangeDetectorRef);
 
   profile: UserProfile | null = null;
+  posts: PostSummary[] = [];
   loading = false;
   error: string | null = null;
   followBusy = false;
 
-  private sub: Subscription | null = null;
+  private profileSub: Subscription | null = null;
+  private postsSub: Subscription | null = null;
   private prevReloadTick = -1;
   private prevUsername: string | null | undefined = undefined;
 
@@ -49,7 +56,31 @@ export class ProfileComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.profileSub?.unsubscribe();
+    this.postsSub?.unsubscribe();
+  }
+
+  goBack(): void {
+    this.shell.goBackFromProfile();
+  }
+
+  openEdit(): void {
+    this.shell.openEditProfile();
+  }
+
+  logout(): void {
+    const done = () => {
+      this.shell.openFeed();
+      void this.router.navigate(['/login']);
+    };
+    this.auth.logout().subscribe({ next: done, error: done });
+  }
+
+  openReel(post: PostSummary): void {
+    const username = this.profile?.username;
+    if (username) {
+      this.shell.openProfileReel(username, post.id);
+    }
   }
 
   toggleFollow(): void {
@@ -100,22 +131,38 @@ export class ProfileComponent implements OnDestroy {
     this.loading = true;
     this.error = null;
     this.cdr.markForCheck();
-    this.sub?.unsubscribe();
+    this.profileSub?.unsubscribe();
 
     const profile$ = username
       ? this.users.getProfile(username)
       : this.users.me();
 
-    this.sub = profile$.subscribe({
+    this.profileSub = profile$.subscribe({
       next: (profile) => {
         this.profile = profile;
         this.loading = false;
+        this.loadPosts(profile.username);
         this.cdr.markForCheck();
       },
       error: () => {
         this.loading = false;
         this.error = 'Não foi possível carregar o perfil.';
         this.profile = null;
+        this.posts = [];
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private loadPosts(username: string): void {
+    this.postsSub?.unsubscribe();
+    this.postsSub = this.users.userPosts(username, undefined, 30).subscribe({
+      next: (page) => {
+        this.posts = page.items;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.posts = [];
         this.cdr.markForCheck();
       },
     });

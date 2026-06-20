@@ -28,6 +28,10 @@ import { VideoCardComponent } from './features/feed/video-card/video-card.compon
 
 import { ProfileComponent } from './features/profile/profile.component';
 
+import { EditProfileModalComponent } from './features/profile/edit-profile-modal/edit-profile-modal.component';
+
+import { ProfileReelComponent } from './features/profile/profile-reel/profile-reel.component';
+
 import { AppShellComponent } from './features/shell/app-shell.component';
 
 import { AvatarComponent } from './shared/ui/avatar/avatar.component';
@@ -57,6 +61,10 @@ import { VideoPlayerComponent } from './shared/ui/video-player/video-player.comp
     CreatePostComponent,
 
     ProfileComponent,
+
+    ProfileReelComponent,
+
+    EditProfileModalComponent,
 
     AvatarComponent,
 

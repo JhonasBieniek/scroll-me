@@ -30,14 +30,13 @@ type FeedPhase = 'following' | 'discover';
 })
 export class FeedComponent implements AfterViewInit, OnDestroy {
   private readonly postsService = inject(PostsService);
-  private readonly shell = inject(ShellState);
+  protected readonly shell = inject(ShellState);
   private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChildren(VideoCardComponent) cards!: QueryList<VideoCardComponent>;
 
   posts: PostSummary[] = [];
   activeIndex = 0;
-  muted = true;
   loading = false;
   suggestionsIndex = -1;
 
@@ -60,11 +59,23 @@ export class FeedComponent implements AfterViewInit, OnDestroy {
       this.resetFeed();
       this.loadPage();
     });
+
+    effect(() => {
+      const postId = this.shell.pendingCommentsPostId();
+      if (!postId) {
+        return;
+      }
+      queueMicrotask(() => this.tryOpenPendingComments());
+    });
   }
 
   ngAfterViewInit(): void {
-    this.cardsSub = this.cards.changes.subscribe(() => this.observeCards());
+    this.cardsSub = this.cards.changes.subscribe(() => {
+      this.observeCards();
+      this.tryOpenPendingComments();
+    });
     this.observeCards();
+    this.tryOpenPendingComments();
   }
 
   ngOnDestroy(): void {
@@ -75,6 +86,10 @@ export class FeedComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
+    if (this.shouldIgnoreKeyboardShortcut()) {
+      return;
+    }
+
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -98,8 +113,26 @@ export class FeedComponent implements AfterViewInit, OnDestroy {
   }
 
   toggleMute(): void {
-    this.muted = !this.muted;
-    this.cdr.markForCheck();
+    this.shell.toggleFeedMuted();
+  }
+
+  private shouldIgnoreKeyboardShortcut(): boolean {
+    if (this.cards?.some((card) => card.commentsOpen)) {
+      return true;
+    }
+
+    const el = document.activeElement;
+    if (!(el instanceof HTMLElement)) {
+      return false;
+    }
+
+    const tag = el.tagName;
+    return (
+      tag === 'INPUT' ||
+      tag === 'TEXTAREA' ||
+      tag === 'SELECT' ||
+      el.isContentEditable
+    );
   }
 
   private resetFeed(): void {
@@ -171,7 +204,29 @@ export class FeedComponent implements AfterViewInit, OnDestroy {
     if (fresh.length > 0) {
       this.posts = [...this.posts, ...fresh];
       this.cdr.markForCheck();
+      this.tryOpenPendingComments();
     }
+  }
+
+  private tryOpenPendingComments(): void {
+    const postId = this.shell.pendingCommentsPostId();
+    if (!postId || !this.cards) {
+      return;
+    }
+
+    const index = this.posts.findIndex((post) => post.id === postId);
+    if (index < 0) {
+      return;
+    }
+
+    const card = this.cards.get(index);
+    if (!card) {
+      return;
+    }
+
+    this.shell.pendingCommentsPostId.set(null);
+    card.scrollIntoView();
+    card.openComments();
   }
 
   private loadPage(): void {

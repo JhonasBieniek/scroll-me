@@ -26,6 +26,7 @@ describe('UploadService', () => {
 
   const file: UploadedFile = {
     path: '/tmp/uploads/original-abc.mp4',
+    filename: 'original-abc.mp4',
     originalname: 'demo.mp4',
     size: 1024,
   };
@@ -95,10 +96,10 @@ describe('UploadService', () => {
     ).rejects.toBeInstanceOf(ServiceUnavailableException);
   });
 
-  it('rejeita limpeza quando caminho está fora do tmp root', async () => {
+  it('rejeita limpeza quando basename do upload é inválido', async () => {
     await expect(
       service.process({
-        file: { ...file, path: '/etc/passwd' },
+        file: { ...file, filename: '../etc/passwd' },
         userId: 'user-1',
       }),
     ).rejects.toBeInstanceOf(BadRequestException);

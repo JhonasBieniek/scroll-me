@@ -15,6 +15,13 @@ export interface CreateUserInput {
   role?: Role;
 }
 
+export interface UpdateProfileInput {
+  displayName?: string;
+  bio?: string | null;
+  username?: string;
+  avatarKey?: string | null;
+}
+
 export interface ProfileCounts {
   posts: number;
   followers: number;
@@ -74,6 +81,34 @@ export class UsersService {
       role: data.role ?? Role.USER,
     };
     return this.prisma.user.create({ data: payload });
+  }
+
+  async updateProfile(
+    userId: string,
+    input: UpdateProfileInput,
+  ): Promise<User> {
+    const data: Prisma.UserUpdateInput = {};
+    if (input.displayName !== undefined) {
+      data.displayName = input.displayName.trim();
+    }
+    if (input.bio !== undefined) {
+      data.bio = input.bio;
+    }
+    if (input.avatarKey !== undefined) {
+      data.avatarKey = input.avatarKey;
+    }
+    if (input.username !== undefined) {
+      const username = normalizeUsername(input.username);
+      if (!isValidUsername(username)) {
+        throw new ConflictException('Username inválido.');
+      }
+      const existing = await this.findByUsername(username);
+      if (existing && existing.id !== userId) {
+        throw new ConflictException('Username já em uso.');
+      }
+      data.username = username;
+    }
+    return this.prisma.user.update({ where: { id: userId }, data });
   }
 
   async getCounts(userId: string): Promise<ProfileCounts> {

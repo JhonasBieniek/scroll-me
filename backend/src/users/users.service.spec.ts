@@ -8,6 +8,7 @@ describe('UsersService', () => {
     user: {
       findUnique: jest.Mock;
       count: jest.Mock;
+      update: jest.Mock;
     };
     post: { count: jest.Mock };
     follow: {
@@ -27,6 +28,7 @@ describe('UsersService', () => {
       user: {
         findUnique: jest.fn(),
         count: jest.fn(),
+        update: jest.fn(),
       },
       post: { count: jest.fn() },
       follow: {
@@ -103,5 +105,61 @@ describe('UsersService', () => {
     await expect(service.getByUsernameOrFail('ghost')).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it('updateProfile atualiza displayName e bio', async () => {
+    const updated = {
+      id: userId,
+      username: 'alice',
+      displayName: 'Alice Nova',
+      bio: 'Olá',
+    };
+    prisma.user.update.mockResolvedValue(updated);
+
+    const result = await service.updateProfile(userId, {
+      displayName: ' Alice Nova ',
+      bio: 'Olá',
+    });
+
+    expect(result).toEqual(updated);
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: userId },
+      data: { displayName: 'Alice Nova', bio: 'Olá' },
+    });
+  });
+
+  it('updateProfile rejeita username inválido', async () => {
+    await expect(
+      service.updateProfile(userId, { username: 'ab' }),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('updateProfile rejeita username em uso por outro usuário', async () => {
+    prisma.user.findUnique.mockResolvedValue({
+      id: otherId,
+      username: 'taken',
+    });
+
+    await expect(
+      service.updateProfile(userId, { username: 'taken' }),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('updateProfile permite manter o próprio username', async () => {
+    prisma.user.findUnique.mockResolvedValue({ id: userId, username: 'alice' });
+    prisma.user.update.mockResolvedValue({
+      id: userId,
+      username: 'alice',
+      displayName: 'Alice',
+    });
+
+    await service.updateProfile(userId, { username: 'Alice' });
+
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: userId },
+      data: { username: 'alice' },
+    });
   });
 });
