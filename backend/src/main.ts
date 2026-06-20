@@ -47,6 +47,8 @@ async function bootstrap(): Promise<void> {
   await app.listen(port);
 
   const logger = new Logger('Bootstrap');
-  logger.log(`API ouvindo em http://0.0.0.0:${port} (logs de requisição: HTTP)`);
+  logger.log(
+    `API ouvindo em http://0.0.0.0:${port} (logs de requisição: HTTP)`,
+  );
 }
 void bootstrap();

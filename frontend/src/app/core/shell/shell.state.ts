@@ -5,6 +5,7 @@ export type ShellTab = 'feed' | 'create' | 'profile';
 @Injectable({ providedIn: 'root' })
 export class ShellState {
   readonly tab = signal<ShellTab>('feed');
+  readonly profileUsername = signal<string | null>(null);
   readonly profileReloadTick = signal(0);
   readonly feedReloadTick = signal(0);
   readonly pendingVideoFile = signal<File | null>(null);
@@ -25,6 +26,7 @@ export class ShellState {
 
   openFeed(): void {
     this.tab.set('feed');
+    this.profileUsername.set(null);
   }
 
   openCreate(): void {
@@ -33,5 +35,11 @@ export class ShellState {
 
   openOwnProfile(): void {
     this.tab.set('profile');
+    this.profileUsername.set(null);
+  }
+
+  openUserProfile(username: string): void {
+    this.tab.set('profile');
+    this.profileUsername.set(username);
   }
 }

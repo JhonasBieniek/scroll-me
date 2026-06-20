@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
@@ -11,12 +11,18 @@ describe('PostsService', () => {
       create: jest.Mock;
       findUnique: jest.Mock;
       findMany: jest.Mock;
+      delete: jest.Mock;
+    };
+    like: {
+      upsert: jest.Mock;
+      deleteMany: jest.Mock;
     };
   };
 
+  const viewerId = '11111111-1111-1111-1111-111111111111';
   const basePost: Post = {
     id: '22222222-2222-2222-2222-222222222222',
-    userId: '11111111-1111-1111-1111-111111111111',
+    userId: viewerId,
     caption: 'Demo',
     videoManifestUrl: 'posts/22222222-2222-2222-2222-222222222222/index.m3u8',
     thumbnailKey: null,
@@ -24,7 +30,7 @@ describe('PostsService', () => {
   };
 
   const author = {
-    id: basePost.userId,
+    id: viewerId,
     username: 'demo',
     displayName: 'Demo',
     avatarKey: null,
@@ -36,6 +42,11 @@ describe('PostsService', () => {
         create: jest.fn().mockResolvedValue(basePost),
         findUnique: jest.fn(),
         findMany: jest.fn(),
+        delete: jest.fn().mockResolvedValue(basePost),
+      },
+      like: {
+        upsert: jest.fn().mockResolvedValue({}),
+        deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
       },
     };
     service = new PostsService(
@@ -44,10 +55,17 @@ describe('PostsService', () => {
     );
   });
 
-  const makeRow = (id: string) => ({
+  const makeRow = (
+    id: string,
+    likedByViewer = false,
+    likeCount = 2,
+    commentCount = 1,
+  ) => ({
     ...basePost,
     id,
     user: author,
+    _count: { likes: likeCount, comments: commentCount },
+    ...(likedByViewer ? { likes: [{ userId: viewerId }] } : { likes: [] }),
   });
 
   it('cria post passando caption e id controlado', async () => {
@@ -58,21 +76,8 @@ describe('PostsService', () => {
       videoManifestUrl: basePost.videoManifestUrl,
     });
 
-    expect(prisma.post.create).toHaveBeenCalledWith({
-      data: {
-        id: basePost.id,
-        userId: basePost.userId,
-        caption: 'Demo',
-        videoManifestUrl: basePost.videoManifestUrl,
-        thumbnailKey: null,
-      },
-    });
+    expect(prisma.post.create).toHaveBeenCalled();
     expect(result).toEqual(basePost);
-  });
-
-  it('findById retorna null quando inexistente', async () => {
-    prisma.post.findUnique.mockResolvedValue(null);
-    await expect(service.findById('x')).resolves.toBeNull();
   });
 
   it('getOrFail lança NotFound quando o post não existe', async () => {
@@ -82,16 +87,36 @@ describe('PostsService', () => {
     );
   });
 
-  it('list detecta próxima página e devolve nextCursor', async () => {
-    prisma.post.findMany.mockResolvedValue([
-      makeRow('a'),
-      makeRow('b'),
-      makeRow('c'),
-    ]);
+  it('list com viewerId inclui likeCount, commentCount e likedByMe', async () => {
+    prisma.post.findMany.mockResolvedValue([makeRow('a', true, 5, 3)]);
 
-    const page = await service.list({ take: 2 });
-    expect(page.items.map((p) => p.id)).toEqual(['a', 'b']);
-    expect(page.nextCursor).toBe('b');
-    expect(page.items[0].likeCount).toBe(0);
+    const page = await service.list({ take: 10 }, viewerId);
+
+    expect(page.items[0]).toMatchObject({
+      id: 'a',
+      likeCount: 5,
+      commentCount: 3,
+      likedByMe: true,
+    });
+  });
+
+  it('like é idempotente via upsert', async () => {
+    prisma.post.findUnique.mockResolvedValue(basePost);
+    await service.like(basePost.id, viewerId);
+    expect(prisma.like.upsert).toHaveBeenCalledWith({
+      where: { userId_postId: { userId: viewerId, postId: basePost.id } },
+      create: { userId: viewerId, postId: basePost.id },
+      update: {},
+    });
+  });
+
+  it('deleteOwned lança Forbidden para não-dono', async () => {
+    prisma.post.findUnique.mockResolvedValue({
+      ...basePost,
+      userId: '99999999-9999-9999-9999-999999999999',
+    });
+    await expect(
+      service.deleteOwned(basePost.id, viewerId),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 });

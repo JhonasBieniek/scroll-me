@@ -13,6 +13,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { validateEnv } from './config/env.validation';
 import { FeedModule } from './feed/feed.module';
+import { CommentsModule } from './comments/comments.module';
 import { PostsModule } from './posts/posts.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { StorageModule } from './storage/storage.module';
@@ -41,6 +42,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     PostsModule,
     FeedModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [

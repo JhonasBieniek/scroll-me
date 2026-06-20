@@ -14,4 +14,26 @@ export class UsersService {
       withCredentials: true,
     });
   }
+
+  getProfile(username: string): Observable<UserProfile> {
+    return this.http.get<UserProfile>(
+      `${this.baseUrl}/users/${encodeURIComponent(username)}`,
+      { withCredentials: true },
+    );
+  }
+
+  follow(username: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.baseUrl}/users/${encodeURIComponent(username)}/follow`,
+      {},
+      { withCredentials: true },
+    );
+  }
+
+  unfollow(username: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/users/${encodeURIComponent(username)}/follow`,
+      { withCredentials: true },
+    );
+  }
 }

@@ -25,7 +25,11 @@ model User {
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @map("created_at")
 
-  posts Post[]
+  posts     Post[]
+  likes     Like[]
+  comments  Comment[]
+  followers Follow[] @relation("followers")
+  following Follow[] @relation("following")
 
   @@map("users")
 }
@@ -38,9 +42,51 @@ model Post {
   thumbnailKey     String?  @map("thumbnail_key")
   createdAt        DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes    Like[]
+  comments Comment[]
 
   @@index([userId])
   @@index([createdAt(sort: Desc)])
   @@map("posts")
+}
+
+model Follow {
+  followerId  String   @map("follower_id") @db.Uuid
+  followingId String   @map("following_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower  User @relation("followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model Like {
+  userId    String   @map("user_id") @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@index([postId])
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  body      String   @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt(sort: Desc)])
+  @@map("comments")
 }

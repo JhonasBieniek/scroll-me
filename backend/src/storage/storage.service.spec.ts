@@ -84,9 +84,9 @@ describe('StorageService', () => {
 
   it('rejeita bundle HLS sem segmentos .ts', async () => {
     const service = new StorageService(makeConfig());
-    readdirMock.mockResolvedValue([
-      'index.m3u8',
-    ] as unknown as Awaited<ReturnType<typeof readdir>>);
+    readdirMock.mockResolvedValue(['index.m3u8'] as unknown as Awaited<
+      ReturnType<typeof readdir>
+    >);
 
     await expect(
       service.uploadHlsBundle('/tmp/hls', 'posts/p1'),

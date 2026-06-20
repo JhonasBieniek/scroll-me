@@ -73,6 +73,20 @@ export class PostsService {
     );
   }
 
+  like(postId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.baseUrl}/posts/${postId}/like`,
+      {},
+      { withCredentials: true },
+    );
+  }
+
+  unlike(postId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/posts/${postId}/like`, {
+      withCredentials: true,
+    });
+  }
+
   private feedPage(
     kind: 'following' | 'discover',
     cursor?: string,

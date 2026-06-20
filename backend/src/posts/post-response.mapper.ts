@@ -8,6 +8,7 @@ export interface PostResponse {
   createdAt: Date;
   likeCount: number;
   likedByMe: boolean;
+  commentCount: number;
   author: {
     username: string;
     displayName: string;
@@ -33,6 +34,7 @@ export async function mapPostToResponse(
     createdAt: post.createdAt,
     likeCount: post.likeCount,
     likedByMe: post.likedByMe,
+    commentCount: post.commentCount,
     author: {
       username: post.author.username,
       displayName: post.author.displayName,

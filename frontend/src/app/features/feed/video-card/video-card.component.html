@@ -43,17 +43,149 @@
         </svg>
       }
     </button>
+
+    <button
+      type="button"
+      class="action"
+      [class.action--liked]="liked"
+      [attr.aria-pressed]="liked"
+      aria-label="Curtir"
+      (click)="toggleLike()"
+    >
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+        <path
+          [attr.fill]="liked ? 'currentColor' : 'none'"
+          stroke="currentColor"
+          stroke-width="2"
+          d="M12 21s-7.5-4.7-10-9.3C.6 8.4 2.4 5 5.8 5c2 0 3.3 1.2 4.2 2.4C10.9 6.2 12.2 5 14.2 5 17.6 5 19.4 8.4 22 11.7 19.5 16.3 12 21 12 21z"
+        />
+      </svg>
+      <span class="action__count">{{ likeCount }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="action"
+      aria-label="Comentar"
+      (click)="openComments()"
+    >
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linejoin="round"
+          d="M21 11.5a8.5 8.5 0 01-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1121 11.5z"
+        />
+      </svg>
+      <span class="action__count">{{ commentCount }}</span>
+    </button>
   </aside>
 
   <div class="card__overlay">
-    <div class="card__author">
+    <button type="button" class="card__author" (click)="openProfile()">
       <span class="card__avatar">
         <app-avatar [src]="post.author.avatarUrl" [alt]="post.author.displayName" />
       </span>
       <span class="card__username">&#64;{{ post.author.username }}</span>
-    </div>
+    </button>
     @if (post.caption) {
       <p class="card__caption">{{ post.caption }}</p>
     }
   </div>
+
+  @if (commentsOpen) {
+    <div class="comments" role="dialog" aria-label="Comentários">
+      <button
+        type="button"
+        class="comments__backdrop"
+        aria-label="Fechar comentários"
+        (click)="closeComments()"
+      ></button>
+      <section class="comments__sheet">
+        <header class="comments__header">
+          <h2 class="comments__title">Comentários</h2>
+          <button
+            type="button"
+            class="comments__close"
+            aria-label="Fechar"
+            (click)="closeComments()"
+          >
+            ✕
+          </button>
+        </header>
+
+        <ul class="comments__list" (scroll)="onCommentsScroll($event)">
+          @if (comments.length === 0 && !commentsLoading) {
+            <li class="comments__empty">Seja o primeiro a comentar.</li>
+          }
+          @for (comment of comments; track comment.id) {
+            <li class="comments__item">
+              <span class="comments__avatar">
+                <app-avatar
+                  [src]="comment.author.avatarUrl"
+                  [alt]="comment.author.displayName"
+                />
+              </span>
+              <div class="comments__body">
+                <button
+                  type="button"
+                  class="comments__meta comments__author"
+                  (click)="openCommentAuthorProfile(comment.author.username)"
+                >
+                  <strong>{{ comment.author.displayName }}</strong>
+                  <span>&#64;{{ comment.author.username }}</span>
+                </button>
+                <p class="comments__text">{{ comment.body }}</p>
+              </div>
+              @if (comment.author.username === currentUsername) {
+                <button
+                  type="button"
+                  class="comments__delete"
+                  aria-label="Excluir comentário"
+                  (click)="deleteComment(comment)"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"
+                    />
+                  </svg>
+                </button>
+              }
+            </li>
+          }
+          @if (commentsLoading) {
+            <li class="comments__loading" aria-hidden="true"></li>
+          }
+        </ul>
+
+        <form class="comments__form" (submit)="$event.preventDefault(); submitComment()">
+          <input
+            class="comments__input"
+            type="text"
+            maxlength="500"
+            placeholder="Adicione um comentário..."
+            [(ngModel)]="commentDraft"
+            name="commentDraft"
+          />
+          <button
+            type="submit"
+            class="comments__send"
+            [disabled]="!commentDraft.trim() || commentSubmitting"
+          >
+            Publicar
+          </button>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (toast) {
+    <p class="card__toast" role="status">{{ toast }}</p>
+  }
 </article>

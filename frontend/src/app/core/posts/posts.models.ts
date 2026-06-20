@@ -11,6 +11,7 @@ export interface PostSummary {
   createdAt: string;
   likeCount: number;
   likedByMe: boolean;
+  commentCount: number;
   author: PostAuthor;
 }
 

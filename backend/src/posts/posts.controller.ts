@@ -80,11 +80,29 @@ export class PostsController {
       caption: dto.caption,
     });
 
-    const withMeta = await this.posts.getWithMeta(post.id);
+    const withMeta = await this.posts.getWithMeta(post.id, user.id);
     if (!withMeta) {
       throw new NotFoundException('Post não encontrado.');
     }
     return mapPostToResponse(withMeta, this.storage);
+  }
+
+  @HttpPost(':id/like')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async like(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.posts.like(id, user.id);
+  }
+
+  @Delete(':id/like')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async unlike(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.posts.unlike(id, user.id);
   }
 
   @Get(':id/manifest')

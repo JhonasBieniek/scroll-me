@@ -31,6 +31,7 @@ export interface ListPostsInput {
 export interface PostWithMeta extends Post {
   likeCount: number;
   likedByMe: boolean;
+  commentCount: number;
   author: {
     id: string;
     username: string;
@@ -67,7 +68,10 @@ export class PostsService {
     return this.prisma.post.findUnique({ where: { id } });
   }
 
-  async list(input: ListPostsInput = {}): Promise<PostsPage> {
+  async list(
+    input: ListPostsInput = {},
+    viewerId?: string,
+  ): Promise<PostsPage> {
     const take = this.normalizeTake(input.take);
     const where = this.buildWhere(input);
 
@@ -85,6 +89,16 @@ export class PostsService {
             avatarKey: true,
           },
         },
+        _count: { select: { likes: true, comments: true } },
+        ...(viewerId
+          ? {
+              likes: {
+                where: { userId: viewerId },
+                select: { userId: true },
+                take: 1,
+              },
+            }
+          : {}),
       },
     });
 
@@ -93,11 +107,12 @@ export class PostsService {
     const nextCursor = hasMore ? slice[slice.length - 1].id : null;
 
     const items: PostWithMeta[] = slice.map((row) => {
-      const { user, ...post } = row;
+      const { user, _count, likes, ...post } = row;
       return {
         ...post,
-        likeCount: 0,
-        likedByMe: false,
+        likeCount: _count.likes,
+        commentCount: _count.comments,
+        likedByMe: (likes?.length ?? 0) > 0,
         author: user,
       };
     });
@@ -113,7 +128,10 @@ export class PostsService {
     return post;
   }
 
-  async getWithMeta(postId: string): Promise<PostWithMeta | null> {
+  async getWithMeta(
+    postId: string,
+    viewerId?: string,
+  ): Promise<PostWithMeta | null> {
     const row = await this.prisma.post.findUnique({
       where: { id: postId },
       include: {
@@ -125,16 +143,27 @@ export class PostsService {
             avatarKey: true,
           },
         },
+        _count: { select: { likes: true, comments: true } },
+        ...(viewerId
+          ? {
+              likes: {
+                where: { userId: viewerId },
+                select: { userId: true },
+                take: 1,
+              },
+            }
+          : {}),
       },
     });
     if (!row) {
       return null;
     }
-    const { user, ...post } = row;
+    const { user, _count, likes, ...post } = row;
     return {
       ...post,
-      likeCount: 0,
-      likedByMe: false,
+      likeCount: _count.likes,
+      commentCount: _count.comments,
+      likedByMe: (likes?.length ?? 0) > 0,
       author: user,
     };
   }
@@ -150,6 +179,19 @@ export class PostsService {
       await this.storage.deletePrefix(prefix);
     }
     return deleted;
+  }
+
+  async like(postId: string, userId: string): Promise<void> {
+    await this.getOrFail(postId);
+    await this.prisma.like.upsert({
+      where: { userId_postId: { userId, postId } },
+      create: { userId, postId },
+      update: {},
+    });
+  }
+
+  async unlike(postId: string, userId: string): Promise<void> {
+    await this.prisma.like.deleteMany({ where: { userId, postId } });
   }
 
   private buildWhere(input: ListPostsInput): Record<string, unknown> {

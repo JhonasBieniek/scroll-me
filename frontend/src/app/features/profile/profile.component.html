@@ -14,13 +14,42 @@
       <span class="profile__avatar">
         <app-avatar [src]="profile.avatarUrl" [alt]="profile.displayName" />
       </span>
-      <div class="profile__identity">
-        <p class="profile__name">{{ profile.displayName }}</p>
-        @if (profile.bio) {
-          <p class="profile__bio">{{ profile.bio }}</p>
-        }
-      </div>
+      <ul class="profile__counts">
+        <li class="profile__count">
+          <strong>{{ profile.counts.posts }}</strong>
+          <span>publicações</span>
+        </li>
+        <li class="profile__count">
+          <strong>{{ profile.counts.followers }}</strong>
+          <span>seguidores</span>
+        </li>
+        <li class="profile__count">
+          <strong>{{ profile.counts.following }}</strong>
+          <span>seguindo</span>
+        </li>
+      </ul>
     </div>
+
+    <div class="profile__identity">
+      <p class="profile__name">{{ profile.displayName }}</p>
+      @if (profile.bio) {
+        <p class="profile__bio">{{ profile.bio }}</p>
+      }
+    </div>
+
+    @if (!profile.isMe) {
+      <div class="profile__actions">
+        <button
+          type="button"
+          class="profile__follow"
+          [class.profile__follow--active]="profile.isFollowing"
+          [disabled]="followBusy"
+          (click)="toggleFollow()"
+        >
+          {{ profile.isFollowing ? 'Seguindo' : 'Seguir' }}
+        </button>
+      </div>
+    }
   </section>
 } @else if (error) {
   <div class="profile__state">
