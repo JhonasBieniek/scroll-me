@@ -3,8 +3,11 @@
     class="card__player"
     [src]="manifestSrc"
     [active]="active"
+    [preload]="preload"
     [muted]="muted"
+    [resumeFrom]="resumeFrom"
     (fatalError)="onPlayerError()"
+    (resumeApplied)="onResumeApplied()"
   />
 
   @if (badge) {
@@ -160,7 +163,9 @@
             </li>
           }
           @if (commentsLoading) {
-            <li class="comments__loading" aria-hidden="true"></li>
+            <li class="comments__loading" aria-hidden="true">
+              <app-ig-spinner />
+            </li>
           }
         </ul>
 

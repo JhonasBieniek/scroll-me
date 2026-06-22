@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from '../api.config';
+import { PlaybackResumeService } from '../playback/playback-resume.service';
 import { ShellState } from '../shell/shell.state';
 import {
   AuthResponse,
@@ -15,6 +16,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
   private readonly shell = inject(ShellState);
+  private readonly playbackResume = inject(PlaybackResumeService);
 
   private readonly accessTokenSig = signal<string | null>(null);
   private readonly userSig = signal<AuthUser | null>(null);
@@ -70,6 +72,7 @@ export class AuthService {
 
   private clearSession(): void {
     this.shell.resetFeedMutedPreference();
+    this.playbackResume.clearAll();
     this.accessTokenSig.set(null);
     this.userSig.set(null);
   }

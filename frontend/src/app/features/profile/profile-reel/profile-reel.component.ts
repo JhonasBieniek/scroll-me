@@ -10,12 +10,15 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { PostSummary } from '../../../core/posts/posts.models';
+import { PostsService } from '../../../core/posts/posts.service';
+import { PlaybackResumeService } from '../../../core/playback/playback-resume.service';
 import { ShellState } from '../../../core/shell/shell.state';
 import { UsersService } from '../../../core/users/users.service';
 import { VideoCardComponent } from '../../feed/video-card/video-card.component';
 
 const ACTIVE_RATIO = 0.75;
-const PREFETCH_THRESHOLD = 2;
+const PRELOAD_AHEAD = 3;
+const PREFETCH_THRESHOLD = PRELOAD_AHEAD;
 
 @Component({
   selector: 'app-profile-reel',
@@ -26,13 +29,16 @@ const PREFETCH_THRESHOLD = 2;
 })
 export class ProfileReelComponent implements AfterViewInit, OnDestroy {
   private readonly users = inject(UsersService);
+  private readonly postsService = inject(PostsService);
   protected readonly shell = inject(ShellState);
+  private readonly playbackResume = inject(PlaybackResumeService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChildren(VideoCardComponent) cards!: QueryList<VideoCardComponent>;
 
   posts: PostSummary[] = [];
   activeIndex = 0;
+  activeResumeFrom: number | null = null;
 
   private observer: IntersectionObserver | null = null;
   private cursor: string | null = null;
@@ -70,6 +76,11 @@ export class ProfileReelComponent implements AfterViewInit, OnDestroy {
 
   toggleMute(): void {
     this.shell.toggleFeedMuted();
+  }
+
+  isPreload(i: number): boolean {
+    const diff = i - this.activeIndex;
+    return diff === -1 || (diff >= 1 && diff <= PRELOAD_AHEAD);
   }
 
   private observeCards(): void {
@@ -112,11 +123,30 @@ export class ProfileReelComponent implements AfterViewInit, OnDestroy {
     if (index === this.activeIndex) {
       return;
     }
+
+    const prevCard = this.cards?.get(this.activeIndex);
+    const prevPost = this.posts[this.activeIndex];
+    if (prevCard && prevPost) {
+      this.playbackResume.saveScroll(prevPost.id, prevCard.getCurrentTime());
+      prevCard.pause();
+    }
+
     this.activeIndex = index;
+    this.activeResumeFrom = null;
+
+    const nextPost = this.posts[index];
+    if (nextPost) {
+      const resumeTime = this.playbackResume.consumeScroll(nextPost.id);
+      if (resumeTime !== null) {
+        this.activeResumeFrom = resumeTime;
+      }
+    }
+
     const reel = this.shell.profileReel();
     if (reel && index >= this.posts.length - PREFETCH_THRESHOLD) {
       this.loadPage(reel.username);
     }
+    this.prefetchManifestsAhead(index);
     this.cdr.markForCheck();
   }
 
@@ -141,8 +171,23 @@ export class ProfileReelComponent implements AfterViewInit, OnDestroy {
     if (card) {
       card.hostElement.scrollIntoView({ block: 'start' });
       this.activeIndex = index;
+      this.prefetchManifestsAhead(index);
       this.scrolledToStart = true;
       this.cdr.markForCheck();
+    }
+  }
+
+  private prefetchManifestsAhead(fromIndex: number): void {
+    const ids: string[] = [];
+    for (
+      let i = fromIndex + 1;
+      i <= fromIndex + PRELOAD_AHEAD && i < this.posts.length;
+      i++
+    ) {
+      ids.push(this.posts[i].id);
+    }
+    if (ids.length > 0) {
+      this.postsService.prefetchManifests(ids);
     }
   }
 
@@ -159,7 +204,18 @@ export class ProfileReelComponent implements AfterViewInit, OnDestroy {
           const seen = new Set(this.posts.map((p) => p.id));
           const fresh = page.items.filter((p) => !seen.has(p.id));
           if (fresh.length > 0) {
+            const wasEmpty = this.posts.length === 0;
             this.posts = [...this.posts, ...fresh];
+            if (wasEmpty) {
+              const reel = this.shell.profileReel();
+              const startInBatch = reel?.startPostId
+                ? fresh.find((post) => post.id === reel.startPostId)
+                : undefined;
+              this.postsService
+                .getManifest((startInBatch ?? fresh[0]).id)
+                .subscribe();
+            }
+            this.prefetchManifestsAhead(this.activeIndex);
           }
           this.cursor = page.nextCursor;
           this.endReached = page.nextCursor === null;

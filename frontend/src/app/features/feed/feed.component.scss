@@ -17,23 +17,6 @@
   display: none;
 }
 
-.feed__bar {
-  position: absolute;
-  inset: 0 0 auto 0;
-  display: flex;
-  align-items: center;
-  padding: var(--space-4) var(--space-5);
-  z-index: 4;
-  background: linear-gradient(to bottom, var(--overlay), transparent);
-  pointer-events: none;
-}
-
-.feed__brand {
-  font-weight: var(--weight-display);
-  font-size: var(--text-lg);
-  color: var(--text);
-}
-
 .feed__state {
   height: var(--content-height);
   display: flex;
@@ -52,25 +35,4 @@
 .feed__empty-text {
   color: var(--text-secondary);
   max-width: 30ch;
-}
-
-.feed__more {
-  display: grid;
-  place-items: center;
-  padding: var(--space-6);
-}
-
-.feed__spinner {
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: var(--radius-full);
-  animation: feed-spin 0.8s linear infinite;
-}
-
-@keyframes feed-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

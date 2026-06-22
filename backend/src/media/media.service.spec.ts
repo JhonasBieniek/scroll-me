@@ -49,7 +49,7 @@ describe('MediaService', () => {
     service = new MediaService();
   });
 
-  it('configura HLS (segmentos de 4s, H.264/AAC)', async () => {
+  it('configura HLS (segmentos de 2s, H.264/AAC)', async () => {
     ffmpegMock.__command.run.mockImplementation(() => {
       ffmpegMock.__handlers.end();
     });
@@ -62,7 +62,7 @@ describe('MediaService', () => {
     const hlsOptions = calls[1][0];
     expect(hlsOptions).toContain('-c:v libx264');
     expect(hlsOptions).toContain('-pix_fmt yuv420p');
-    expect(hlsOptions).toContain('-hls_time 4');
+    expect(hlsOptions).toContain('-hls_time 2');
     expect(hlsOptions).toContain(`-vf scale=-2:min(${MAX_VIDEO_HEIGHT}\\,ih)`);
   });
 

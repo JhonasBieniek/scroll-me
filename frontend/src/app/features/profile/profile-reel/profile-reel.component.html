@@ -16,8 +16,9 @@
     <app-video-card
       [post]="post"
       [active]="i === activeIndex"
-      [preload]="i === activeIndex + 1"
+      [preload]="isPreload(i)"
       [muted]="shell.feedMuted()"
+      [resumeFrom]="i === activeIndex ? activeResumeFrom : null"
       (toggleMuted)="toggleMute()"
     />
   }

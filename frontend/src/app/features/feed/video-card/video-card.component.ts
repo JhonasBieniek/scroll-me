@@ -33,9 +33,11 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
   @Input() preload = false;
   @Input() muted = true;
   @Input() badge: string | null = null;
+  @Input() resumeFrom: number | null = null;
 
   @Output() toggleMuted = new EventEmitter<void>();
   @Output() commentCountChange = new EventEmitter<number>();
+  @Output() resumeApplied = new EventEmitter<void>();
 
   @ViewChild(VideoPlayerComponent) player?: VideoPlayerComponent;
 
@@ -80,11 +82,32 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
 
     if (
       (changes['active'] || changes['preload']) &&
+      !this.active &&
+      !this.preload &&
+      this.manifestSrc
+    ) {
+      this.revokeManifestBlob();
+      this.manifestSrc = null;
+      this.fetching = false;
+      this.retried = false;
+    }
+
+    if (
+      (changes['post'] || changes['active'] || changes['preload']) &&
       (this.active || this.preload) &&
       !this.manifestSrc &&
       !this.fetching
     ) {
       this.fetchManifest();
+    }
+
+    if (
+      (changes['resumeFrom'] || changes['active']) &&
+      this.active &&
+      this.resumeFrom != null &&
+      this.resumeFrom > 0
+    ) {
+      this.player?.seekTo(this.resumeFrom);
     }
   }
 
@@ -95,8 +118,23 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
     }
   }
 
-  scrollIntoView(): void {
-    this.hostElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  scrollIntoView(instant = false): void {
+    this.hostElement.scrollIntoView({
+      behavior: instant ? 'instant' : 'smooth',
+      block: 'start',
+    });
+  }
+
+  getCurrentTime(): number {
+    return this.player?.getCurrentTime() ?? 0;
+  }
+
+  pause(): void {
+    this.player?.pause();
+  }
+
+  onResumeApplied(): void {
+    this.resumeApplied.emit();
   }
 
   togglePlay(): void {
@@ -272,6 +310,9 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
         this.manifestSrc = this.manifestBlobUrl;
         this.fetching = false;
         this.cdr.markForCheck();
+        if (this.active && this.resumeFrom != null && this.resumeFrom > 0) {
+          queueMicrotask(() => this.player?.seekTo(this.resumeFrom!));
+        }
       },
       error: () => {
         this.fetching = false;

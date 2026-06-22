@@ -193,18 +193,3 @@
   min-height: 40dvh;
   color: var(--text-secondary);
 }
-
-.profile__spinner {
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: var(--radius-full);
-  animation: profile-spin 0.8s linear infinite;
-}
-
-@keyframes profile-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}

@@ -36,6 +36,8 @@ import { AppShellComponent } from './features/shell/app-shell.component';
 
 import { AvatarComponent } from './shared/ui/avatar/avatar.component';
 
+import { IgSpinnerComponent } from './shared/ui/ig-spinner/ig-spinner.component';
+
 import { VideoPlayerComponent } from './shared/ui/video-player/video-player.component';
 
 
@@ -67,6 +69,8 @@ import { VideoPlayerComponent } from './shared/ui/video-player/video-player.comp
     EditProfileModalComponent,
 
     AvatarComponent,
+
+    IgSpinnerComponent,
 
     VideoPlayerComponent,
 

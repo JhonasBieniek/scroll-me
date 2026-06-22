@@ -3,7 +3,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import { Injectable, Logger } from '@nestjs/common';
 
 export const HLS_MANIFEST_NAME = 'index.m3u8';
-const HLS_SEGMENT_SECONDS = 4;
+const HLS_SEGMENT_SECONDS = 2;
 export const MAX_VIDEO_HEIGHT = 1080;
 
 /** FFmpeg no Windows interpreta `\t` em caminhos como TAB — use barras `/`. */

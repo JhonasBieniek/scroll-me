@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 import { API_BASE_URL } from '../api.config';
 import {
   FeedPage,
@@ -21,6 +21,7 @@ import {
 export class PostsService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
+  private readonly manifestCache = new Map<string, Observable<ManifestResponse>>();
 
   followingFeed(cursor?: string, take = 10): Observable<FeedPage> {
     return this.feedPage('following', cursor, take);
@@ -67,10 +68,22 @@ export class PostsService {
   }
 
   getManifest(postId: string): Observable<ManifestResponse> {
-    return this.http.get<ManifestResponse>(
-      `${this.baseUrl}/posts/${postId}/manifest`,
-      { withCredentials: true },
-    );
+    let cached = this.manifestCache.get(postId);
+    if (!cached) {
+      cached = this.http
+        .get<ManifestResponse>(`${this.baseUrl}/posts/${postId}/manifest`, {
+          withCredentials: true,
+        })
+        .pipe(shareReplay(1));
+      this.manifestCache.set(postId, cached);
+    }
+    return cached;
+  }
+
+  prefetchManifests(postIds: string[]): void {
+    for (const postId of postIds) {
+      this.getManifest(postId).subscribe();
+    }
   }
 
   like(postId: string): Observable<void> {
