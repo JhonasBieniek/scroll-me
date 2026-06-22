@@ -22,11 +22,12 @@ Portfolio-grade short-video social network (reels-style) with **HLS adaptive str
 | Layer | Technology |
 |-------|------------|
 | Frontend | Angular 19 (NgModules, `ChangeDetectionStrategy.OnPush`), `hls.js` |
-| Backend | NestJS 11, Prisma 6, PostgreSQL 16 |
+| Backend | NestJS 11 |
+| Database | PostgreSQL 16 + Prisma 6 — users, posts, likes, follows, comments (relational / social graph) |
+| Object storage | Cloudflare R2 (S3-compatible) — HLS segments, thumbnails, avatars; presigned URLs for playback |
 | Media | `fluent-ffmpeg` → HLS (`.m3u8` + `.ts` segments), JPEG thumbnail |
-| Storage | Cloudflare R2 (S3-compatible), presigned URLs |
+| Testing | Jest + ts-jest (`*.spec.ts`); backend unit tests in CI |
 | CI / security | GitHub Actions (lint, test, build), CodeQL |
-| Deploy target | Cloudflare Pages (frontend) · VPS + Coolify (API) |
 
 ## Technical highlights
 
@@ -153,7 +154,7 @@ cd backend && npm run lint && npm test && npm run build
 cd frontend && npm run build
 ```
 
-CI runs the same checks on push/PR; CodeQL scans JavaScript/TypeScript weekly and on every push.
+Backend unit tests run with **Jest** (`npm test`); CI runs lint, Jest, and build on push/PR. CodeQL scans JavaScript/TypeScript weekly and on every push.
 
 ## License
 

@@ -22,11 +22,12 @@ Rede social de vídeos curtos estilo reels, com **streaming HLS adaptativo**, gr
 | Camada | Tecnologia |
 |--------|------------|
 | Frontend | Angular 19 (NgModules, `ChangeDetectionStrategy.OnPush`), `hls.js` |
-| Backend | NestJS 11, Prisma 6, PostgreSQL 16 |
+| Backend | NestJS 11 |
+| Banco de dados | PostgreSQL 16 + Prisma 6 — usuários, posts, likes, follows, comentários (dados relacionais / grafo social) |
+| Object storage | Cloudflare R2 (compatível S3) — segmentos HLS, thumbnails, avatares; URLs presignadas para reprodução |
 | Mídia | `fluent-ffmpeg` → HLS (`.m3u8` + segmentos `.ts`), thumbnail JPEG |
-| Storage | Cloudflare R2 (compatível S3), URLs presignadas |
+| Testes | Jest + ts-jest (`*.spec.ts`); testes unitários do backend na CI |
 | CI / segurança | GitHub Actions (lint, test, build), CodeQL |
-| Deploy alvo | Cloudflare Pages (frontend) · VPS + Coolify (API) |
 
 ## Destaques técnicos
 
@@ -153,7 +154,7 @@ cd backend && npm run lint && npm test && npm run build
 cd frontend && npm run build
 ```
 
-A CI executa as mesmas verificações em push/PR; o CodeQL analisa JavaScript/TypeScript semanalmente e a cada push.
+Testes unitários do backend com **Jest** (`npm test`); a CI executa lint, Jest e build em push/PR. O CodeQL analisa JavaScript/TypeScript semanalmente e a cada push.
 
 ## Licença
 
