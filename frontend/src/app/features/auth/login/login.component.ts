@@ -42,6 +42,10 @@ export class LoginComponent {
     void this.router.navigate(['/']);
   }
 
+  loginWithGitHub(): void {
+    this.auth.loginWithGitHub();
+  }
+
   submit(): void {
     this.serverError.set(null);
 

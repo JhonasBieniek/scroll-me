@@ -64,6 +64,10 @@ export class LoginPromptModalComponent {
     void this.router.navigate(['/register']);
   }
 
+  loginWithGitHub(): void {
+    this.auth.loginWithGitHub();
+  }
+
   submit(): void {
     this.serverError.set(null);
     if (this.form.invalid) {

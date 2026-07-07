@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { AuthResult, AuthService, PublicUser } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { GithubOAuthService } from './github-oauth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import type { AuthenticatedUser } from './types/jwt-payload';
@@ -31,6 +33,7 @@ interface AuthResponse {
 export class AuthController {
   constructor(
     private readonly auth: AuthService,
+    private readonly github: GithubOAuthService,
     private readonly config: ConfigService,
   ) {}
 
@@ -56,6 +59,33 @@ export class AuthController {
     const result = await this.auth.login(dto);
     this.setRefreshCookie(res, result.refreshToken);
     return this.toResponse(result);
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Get('github')
+  githubLogin(@Res() res: Response): void {
+    res.redirect(this.github.buildAuthorizeUrl());
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Get('github/callback')
+  async githubCallback(
+    @Query('code') code: string | undefined,
+    @Query('state') state: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    if (!code || !state) {
+      res.redirect(this.githubErrorRedirect());
+      return;
+    }
+
+    try {
+      const result = await this.github.handleCallback(code, state);
+      this.setRefreshCookie(res, result.refreshToken);
+      res.redirect(this.githubSuccessRedirect());
+    } catch {
+      res.redirect(this.githubErrorRedirect());
+    }
   }
 
   @UseGuards(JwtRefreshGuard)
@@ -101,5 +131,17 @@ export class AuthController {
       sameSite: 'strict',
       path: REFRESH_COOKIE_PATH,
     };
+  }
+
+  private frontendOrigin(): string {
+    return this.config.get<string>('FRONTEND_ORIGIN', 'http://localhost:4200');
+  }
+
+  private githubSuccessRedirect(): string {
+    return `${this.frontendOrigin()}/auth/callback`;
+  }
+
+  private githubErrorRedirect(): string {
+    return `${this.frontendOrigin()}/auth/callback?error=github`;
   }
 }

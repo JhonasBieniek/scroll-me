@@ -14,8 +14,6 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './types/jwt-payload';
 
 const BCRYPT_SALT_ROUNDS = 12;
-const DUMMY_HASH =
-  '$2b$12$abcdefghijklmnopqrstuuM/xqQ8s8sN7v0w3i7zJ8m3sQ0Yy2wK';
 
 export interface PublicUser {
   id: string;
@@ -69,10 +67,12 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<AuthResult> {
     const user = await this.users.findByEmail(dto.email);
-    const hash = user?.passwordHash ?? DUMMY_HASH;
-    const passwordMatches = await bcrypt.compare(dto.password, hash);
+    if (!user?.passwordHash) {
+      throw new UnauthorizedException('Credenciais inválidas.');
+    }
+    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
 
-    if (!user || !passwordMatches) {
+    if (!passwordMatches) {
       throw new UnauthorizedException('Credenciais inválidas.');
     }
 
@@ -87,7 +87,7 @@ export class AuthService {
     return this.buildAuthResult(user);
   }
 
-  private async buildAuthResult(user: User): Promise<AuthResult> {
+  async buildAuthResult(user: User): Promise<AuthResult> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,

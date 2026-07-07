@@ -53,29 +53,49 @@
           </svg>
         </button>
 
-        <button
-          type="button"
-          class="shell__nav-btn"
-          [class.shell__nav-btn--active]="state.tab() === 'profile'"
-          aria-label="Perfil"
-          (click)="openOwnProfile()"
-        >
-          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-            @if (state.tab() === 'profile') {
-              <path
-                fill="currentColor"
-                d="M12 2a5 5 0 100 10 5 5 0 000-10zm0 12c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"
-              />
-            } @else {
+        @if (auth.isAuthenticated()) {
+          <button
+            type="button"
+            class="shell__nav-btn"
+            [class.shell__nav-btn--active]="state.tab() === 'profile'"
+            aria-label="Perfil"
+            (click)="openOwnProfile()"
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              @if (state.tab() === 'profile') {
+                <path
+                  fill="currentColor"
+                  d="M12 2a5 5 0 100 10 5 5 0 000-10zm0 12c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"
+                />
+              } @else {
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  d="M20 21a8 8 0 00-16 0M12 13a5 5 0 100-10 5 5 0 000 10z"
+                />
+              }
+            </svg>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="shell__nav-btn shell__nav-btn--login"
+            aria-label="Entrar"
+            (click)="goToLogin()"
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
               <path
                 fill="none"
                 stroke="currentColor"
                 stroke-width="1.8"
-                d="M20 21a8 8 0 00-16 0M12 13a5 5 0 100-10 5 5 0 000 10z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"
               />
-            }
-          </svg>
-        </button>
+            </svg>
+          </button>
+        }
       </nav>
     }
 

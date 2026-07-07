@@ -95,6 +95,10 @@ export class AuthService {
     this.guestModeSig.set(false);
   }
 
+  loginWithGitHub(): void {
+    window.location.href = `${this.baseUrl}/auth/github`;
+  }
+
   requireAuth(action: string): boolean {
     if (this.isAuthenticated()) {
       return true;

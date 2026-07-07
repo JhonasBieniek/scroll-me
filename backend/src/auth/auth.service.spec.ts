@@ -36,6 +36,8 @@ describe('AuthService', () => {
     displayName: 'Dev User',
     email: 'dev@scroll.me',
     passwordHash: '',
+    authProvider: 'LOCAL',
+    githubId: null,
     bio: null,
     avatarKey: null,
     role: Role.USER,
@@ -144,7 +146,7 @@ describe('AuthService', () => {
       ).rejects.toBeInstanceOf(UnauthorizedException);
     });
 
-    it('executa bcrypt.compare com hash dummy quando e-mail não existe (anti-timing)', async () => {
+    it('rejeita conta sem senha local sem chamar bcrypt.compare', async () => {
       users.findByEmail.mockResolvedValue(null);
       mockedCompare.mockClear();
 
@@ -152,11 +154,7 @@ describe('AuthService', () => {
         service.login({ email: 'ninguem@scroll.me', password: 'qualquer' }),
       ).rejects.toBeInstanceOf(UnauthorizedException);
 
-      expect(mockedCompare).toHaveBeenCalledTimes(1);
-      expect(mockedCompare).toHaveBeenCalledWith(
-        'qualquer',
-        expect.stringMatching(/^\$2[aby]\$\d+\$/),
-      );
+      expect(mockedCompare).not.toHaveBeenCalled();
     });
   });
 

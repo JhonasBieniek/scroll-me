@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { guestGuard } from './core/auth/guest.guard';
 import { shellGuard } from './core/auth/shell.guard';
+import { AuthCallbackComponent } from './features/auth/auth-callback/auth-callback.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { AppShellComponent } from './features/shell/app-shell.component';
@@ -18,6 +19,11 @@ const routes: Routes = [
     title: 'Criar conta · Scroll Me',
     canActivate: [guestGuard],
     component: RegisterComponent,
+  },
+  {
+    path: 'auth/callback',
+    title: 'Entrando · Scroll Me',
+    component: AuthCallbackComponent,
   },
   {
     pathMatch: 'full',

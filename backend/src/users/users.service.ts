@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, Role, User } from '@prisma/client';
+import { AuthProvider, Prisma, Role, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { isValidUsername, normalizeUsername } from './username.util';
 
@@ -11,8 +11,17 @@ export interface CreateUserInput {
   username: string;
   displayName: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string | null;
   role?: Role;
+  authProvider?: AuthProvider;
+  githubId?: string | null;
+}
+
+export interface GithubUserInput {
+  githubId: string;
+  login: string;
+  displayName: string;
+  email: string;
 }
 
 export interface UpdateProfileInput {
@@ -62,6 +71,70 @@ export class UsersService {
     return user;
   }
 
+  findByGithubId(githubId: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { githubId } });
+  }
+
+  async findOrCreateFromGithub(input: GithubUserInput): Promise<User> {
+    const existing = await this.findByGithubId(input.githubId);
+    if (existing) {
+      return existing;
+    }
+
+    const emailOwner = await this.findByEmail(input.email);
+    if (emailOwner) {
+      if (emailOwner.githubId && emailOwner.githubId !== input.githubId) {
+        throw new ConflictException('Não foi possível concluir o login.');
+      }
+      return this.prisma.user.update({
+        where: { id: emailOwner.id },
+        data: {
+          githubId: input.githubId,
+          authProvider: AuthProvider.GITHUB,
+        },
+      });
+    }
+
+    const username = await this.allocateGithubUsername(input.login);
+    return this.create({
+      username,
+      displayName: input.displayName,
+      email: input.email,
+      authProvider: AuthProvider.GITHUB,
+      githubId: input.githubId,
+      passwordHash: null,
+    });
+  }
+
+  private async allocateGithubUsername(login: string): Promise<string> {
+    const base = this.sanitizeGithubLogin(login);
+    let candidate = base;
+    let suffix = 0;
+
+    while (await this.findByUsername(candidate)) {
+      suffix += 1;
+      const suffixText = String(suffix);
+      const trimmedBase = base.slice(0, Math.max(3, 30 - suffixText.length));
+      candidate = `${trimmedBase}${suffixText}`;
+    }
+
+    return candidate;
+  }
+
+  private sanitizeGithubLogin(login: string): string {
+    const normalized = normalizeUsername(
+      login.replace(/[^a-zA-Z0-9_.]/g, '_'),
+    );
+    if (isValidUsername(normalized)) {
+      return normalized;
+    }
+    const fallback = normalizeUsername(`gh_${login.replace(/[^a-zA-Z0-9]/g, '')}`);
+    if (isValidUsername(fallback)) {
+      return fallback;
+    }
+    return `gh_user_${Date.now().toString(36).slice(-6)}`;
+  }
+
   async create(data: CreateUserInput): Promise<User> {
     const username = normalizeUsername(data.username);
     if (!isValidUsername(username)) {
@@ -77,7 +150,9 @@ export class UsersService {
       username,
       displayName: data.displayName.trim(),
       email: data.email,
-      passwordHash: data.passwordHash,
+      passwordHash: data.passwordHash ?? null,
+      authProvider: data.authProvider ?? AuthProvider.LOCAL,
+      githubId: data.githubId ?? null,
       role: data.role ?? Role.USER,
     };
     return this.prisma.user.create({ data: payload });

@@ -6,6 +6,7 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ShellState } from '../../core/shell/shell.state';
 
@@ -18,7 +19,8 @@ import { ShellState } from '../../core/shell/shell.state';
 })
 export class AppShellComponent {
   protected readonly state = inject(ShellState);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly fileInput =
     viewChild<ElementRef<HTMLInputElement>>('fileInput');
@@ -41,6 +43,11 @@ export class AppShellComponent {
     }
     this.state.openOwnProfile();
     this.cdr.markForCheck();
+  }
+
+  goToLogin(): void {
+    this.auth.exitGuestMode();
+    void this.router.navigate(['/login']);
   }
 
   onFilePicked(event: Event): void {
