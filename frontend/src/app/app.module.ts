@@ -34,6 +34,8 @@ import { ProfileReelComponent } from './features/profile/profile-reel/profile-re
 
 import { AppShellComponent } from './features/shell/app-shell.component';
 
+import { LoginPromptModalComponent } from './features/auth/login-prompt-modal/login-prompt-modal.component';
+
 import { AvatarComponent } from './shared/ui/avatar/avatar.component';
 
 import { IgSpinnerComponent } from './shared/ui/ig-spinner/ig-spinner.component';
@@ -53,6 +55,8 @@ import { VideoPlayerComponent } from './shared/ui/video-player/video-player.comp
     LoginComponent,
 
     RegisterComponent,
+
+    LoginPromptModalComponent,
 
     AppShellComponent,
 

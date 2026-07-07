@@ -37,7 +37,7 @@ export class FeedService {
    * `excludePostIds` evita repetir itens já exibidos no bloco "following".
    */
   discover(
-    viewerId: string,
+    viewerId: string | undefined,
     query: FeedQuery,
     excludePostIds: string[] = [],
   ): Promise<PostsPage> {

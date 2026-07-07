@@ -27,6 +27,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
+      if (auth.isGuest()) {
+        return throwError(() => error);
+      }
+
       return auth.refresh().pipe(
         switchMap((res) => next(withAuth(res.accessToken))),
         catchError((refreshError: unknown) => {

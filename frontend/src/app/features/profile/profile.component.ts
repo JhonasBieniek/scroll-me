@@ -84,6 +84,9 @@ export class ProfileComponent implements OnDestroy {
   }
 
   toggleFollow(): void {
+    if (!this.auth.requireAuth('follow')) {
+      return;
+    }
     const current = this.profile;
     if (!current || current.isMe || this.followBusy) {
       return;
@@ -128,6 +131,12 @@ export class ProfileComponent implements OnDestroy {
   }
 
   private loadProfile(username: string | null): void {
+    if (!username && !this.auth.isAuthenticated()) {
+      this.auth.requireAuth('profile');
+      this.shell.openFeed();
+      return;
+    }
+
     this.loading = true;
     this.error = null;
     this.cdr.markForCheck();

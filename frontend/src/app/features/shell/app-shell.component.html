@@ -58,7 +58,7 @@
           class="shell__nav-btn"
           [class.shell__nav-btn--active]="state.tab() === 'profile'"
           aria-label="Perfil"
-          (click)="state.openOwnProfile()"
+          (click)="openOwnProfile()"
         >
           <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
             @if (state.tab() === 'profile') {
@@ -81,6 +81,10 @@
 
     @if (state.editProfileOpen()) {
       <app-edit-profile-modal />
+    }
+
+    @if (state.loginPromptOpen()) {
+      <app-login-prompt-modal />
     }
   </div>
 </div>

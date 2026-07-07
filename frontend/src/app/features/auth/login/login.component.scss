@@ -1,7 +1,20 @@
+.auth-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.auth-form__actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .field {
@@ -37,7 +50,18 @@
   color: #ed4956;
 }
 
+.auth-divider {
+  margin: 0.25rem 0;
+  font-size: 0.8125rem;
+  color: #737373;
+  text-align: center;
+}
+
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   margin-top: 0.25rem;
   padding: 0.75rem;
   border: none;
@@ -49,13 +73,19 @@
   cursor: pointer;
 }
 
+.btn--secondary {
+  background: transparent;
+  border: 1px solid #363636;
+  color: #fafafa;
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 .auth-alt {
-  margin: 0;
+  margin: 0.5rem 0 0;
   font-size: 0.875rem;
   color: #a8a8a8;
   text-align: center;

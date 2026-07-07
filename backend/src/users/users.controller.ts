@@ -18,7 +18,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'node:path';
 import { safeRmUnderRoot } from '../common/safe-path';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalCurrentUser } from '../auth/decorators/optional-current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/jwt-payload';
 import { FeedQueryDto } from '../feed/dto/feed-query.dto';
 import {
@@ -48,7 +50,6 @@ interface UserPostsResponse {
   nextCursor: string | null;
 }
 
-@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -57,12 +58,14 @@ export class UsersController {
     private readonly storage: StorageService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   async me(@CurrentUser() user: AuthenticatedUser): Promise<ProfileResponse> {
     const profile = await this.users.getByIdOrFail(user.id);
     return this.toProfile(profile, user.id, true, false);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('me')
   async updateMe(
     @CurrentUser() user: AuthenticatedUser,
@@ -76,6 +79,7 @@ export class UsersController {
     return this.toProfile(updated, user.id, true, false);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('me/avatar')
   @UseInterceptors(FileInterceptor('avatar', buildAvatarMulterOptions()))
   async uploadAvatar(
@@ -114,24 +118,27 @@ export class UsersController {
     }
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':username')
   async getProfile(
     @Param('username') username: string,
-    @CurrentUser() viewer: AuthenticatedUser,
+    @OptionalCurrentUser() viewer: AuthenticatedUser | null,
   ): Promise<ProfileResponse> {
     const profile = await this.users.getByUsernameOrFail(username);
-    const isMe = profile.id === viewer.id;
-    const isFollowing = isMe
-      ? false
-      : await this.users.isFollowing(viewer.id, profile.id);
-    return this.toProfile(profile, viewer.id, isMe, isFollowing);
+    const isMe = viewer ? profile.id === viewer.id : false;
+    const isFollowing =
+      viewer && !isMe
+        ? await this.users.isFollowing(viewer.id, profile.id)
+        : false;
+    return this.toProfile(profile, viewer?.id ?? null, isMe, isFollowing);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':username/posts')
   async userPosts(
     @Param('username') username: string,
     @Query() query: FeedQueryDto,
-    @CurrentUser() viewer: AuthenticatedUser,
+    @OptionalCurrentUser() viewer: AuthenticatedUser | null,
   ): Promise<UserPostsResponse> {
     const profile = await this.users.getByUsernameOrFail(username);
     const page = await this.posts.list(
@@ -140,7 +147,7 @@ export class UsersController {
         take: query.take,
         userId: profile.id,
       },
-      viewer.id,
+      viewer?.id,
     );
     return {
       items: await mapPostsToResponse(page.items, this.storage),
@@ -148,6 +155,7 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':username/follow')
   @HttpCode(HttpStatus.NO_CONTENT)
   async follow(
@@ -158,6 +166,7 @@ export class UsersController {
     await this.users.follow(viewer.id, target.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':username/follow')
   @HttpCode(HttpStatus.NO_CONTENT)
   async unfollow(
@@ -176,7 +185,7 @@ export class UsersController {
       bio: string | null;
       avatarKey: string | null;
     },
-    viewerId: string,
+    viewerId: string | null,
     isMe: boolean,
     isFollowing: boolean,
   ): Promise<ProfileResponse> {

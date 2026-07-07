@@ -13,7 +13,9 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalCurrentUser } from '../auth/decorators/optional-current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/jwt-payload';
 import { StorageService } from '../storage/storage.service';
 import {
@@ -30,7 +32,6 @@ interface CommentsListResponse {
   nextCursor: string | null;
 }
 
-@UseGuards(JwtAuthGuard)
 @Controller()
 export class CommentsController {
   constructor(
@@ -38,6 +39,7 @@ export class CommentsController {
     private readonly storage: StorageService,
   ) {}
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('posts/:postId/comments')
   @HttpCode(HttpStatus.OK)
   async listByPost(
@@ -55,6 +57,7 @@ export class CommentsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @Post('posts/:postId/comments')
   @HttpCode(HttpStatus.CREATED)
@@ -67,6 +70,7 @@ export class CommentsController {
     return mapCommentToResponse(comment, this.storage);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('comments/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(

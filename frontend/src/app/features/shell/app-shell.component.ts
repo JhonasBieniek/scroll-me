@@ -6,6 +6,7 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
+import { AuthService } from '../../core/auth/auth.service';
 import { ShellState } from '../../core/shell/shell.state';
 
 @Component({
@@ -17,17 +18,29 @@ import { ShellState } from '../../core/shell/shell.state';
 })
 export class AppShellComponent {
   protected readonly state = inject(ShellState);
+  private readonly auth = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly fileInput =
     viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   openFilePicker(): void {
+    if (!this.auth.requireAuth('post')) {
+      return;
+    }
     const input = this.fileInput()?.nativeElement;
     if (!input) {
       return;
     }
     input.value = '';
     input.click();
+  }
+
+  openOwnProfile(): void {
+    if (!this.auth.requireAuth('profile')) {
+      return;
+    }
+    this.state.openOwnProfile();
+    this.cdr.markForCheck();
   }
 
   onFilePicked(event: Event): void {

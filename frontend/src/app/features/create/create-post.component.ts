@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { friendlyHttpError } from '../../core/http/http-error-message';
+import { AuthService } from '../../core/auth/auth.service';
 import { PostsService } from '../../core/posts/posts.service';
 import { ShellState } from '../../core/shell/shell.state';
 
@@ -23,6 +24,7 @@ const MAX_BYTES = 50 * 1024 * 1024;
 })
 export class CreatePostComponent implements OnInit, OnDestroy {
   private readonly posts = inject(PostsService);
+  private readonly auth = inject(AuthService);
   private readonly shell = inject(ShellState);
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -39,6 +41,11 @@ export class CreatePostComponent implements OnInit, OnDestroy {
   private selectedFile: File | null = null;
 
   ngOnInit(): void {
+    if (!this.auth.isAuthenticated()) {
+      this.auth.requireAuth('post');
+      this.shell.openFeed();
+      return;
+    }
     const pending = this.shell.consumePendingVideoFile();
     if (pending) {
       this.applyFile(pending);

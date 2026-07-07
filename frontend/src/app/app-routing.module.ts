@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { authGuard } from './core/auth/auth.guard';
 import { guestGuard } from './core/auth/guest.guard';
+import { shellGuard } from './core/auth/shell.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { AppShellComponent } from './features/shell/app-shell.component';
@@ -23,10 +23,10 @@ const routes: Routes = [
     pathMatch: 'full',
     path: '',
     title: 'Scroll Me',
-    canActivate: [authGuard],
+    canActivate: [shellGuard],
     component: AppShellComponent,
   },
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: 'login' },
 ];
 
 @NgModule({

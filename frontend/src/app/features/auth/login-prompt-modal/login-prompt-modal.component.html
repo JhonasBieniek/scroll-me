@@ -1,0 +1,52 @@
+<div class="backdrop" (click)="close()"></div>
+<div class="modal" role="dialog" aria-modal="true" aria-label="Entrar">
+  <header class="modal__head">
+    <h2 class="modal__title">Entrar</h2>
+    <button type="button" class="modal__close" aria-label="Fechar" (click)="close()">
+      ×
+    </button>
+  </header>
+
+  <p class="modal__prompt">{{ promptText() }}</p>
+  <p class="modal__guest-note">
+    Visitantes podem apenas navegar pelo feed e perfis.
+  </p>
+
+  <div class="modal__options">
+    <form class="modal__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="modal__field">
+        <span class="modal__label">E-mail</span>
+        <input class="modal__input" type="email" formControlName="email" autocomplete="email"
+          placeholder="voce@dominio.com" />
+      </label>
+
+      <label class="modal__field">
+        <span class="modal__label">Senha</span>
+        <input class="modal__input" type="password" formControlName="password" autocomplete="current-password"
+          placeholder="••••••••" />
+      </label>
+
+      @if (serverError()) {
+      <p class="modal__error" role="alert">{{ serverError() }}</p>
+      }
+
+      <div class="auth-form__actions">
+        <button class="modal__btn modal__btn--primary" type="submit" [disabled]="loading()">
+          {{ loading() ? 'Entrando…' : 'Entrar' }}
+        </button>
+        <p class="modal__register">
+          Não possui uma conta?
+          <button type="button" class="modal__register-link" (click)="goToRegister()">
+            Criar conta
+          </button>
+        </p>
+      </div>
+
+      <p class="modal__divider">ou</p>
+
+      <button class="modal__btn modal__btn--ghost" type="button" (click)="continueAsGuest()">
+        Continuar como visitante
+      </button>
+    </form>
+  </div>
+</div>

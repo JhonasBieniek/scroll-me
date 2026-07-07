@@ -56,7 +56,7 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
   private readonly posts = inject(PostsService);
   private readonly commentsApi = inject(CommentsService);
   private readonly shell = inject(ShellState);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -175,6 +175,9 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
   }
 
   toggleLike(): void {
+    if (!this.auth.requireAuth('like')) {
+      return;
+    }
     const next = !this.liked;
     this.liked = next;
     this.likeCount = Math.max(0, this.likeCount + (next ? 1 : -1));
@@ -219,6 +222,9 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
   }
 
   submitComment(): void {
+    if (!this.auth.requireAuth('comment')) {
+      return;
+    }
     const body = this.commentDraft.trim();
     if (!body || this.commentSubmitting) {
       return;
@@ -244,6 +250,9 @@ export class VideoCardComponent implements OnChanges, OnDestroy {
   }
 
   deleteComment(comment: CommentSummary): void {
+    if (!this.auth.requireAuth('comment')) {
+      return;
+    }
     this.commentsApi.deleteComment(comment.id).subscribe({
       next: () => {
         this.comments = this.comments.filter((item) => item.id !== comment.id);

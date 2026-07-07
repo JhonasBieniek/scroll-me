@@ -3,16 +3,16 @@ import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
-export const guestGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
+export const shellGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.isAuthenticated() || auth.isGuest()) {
-    return of(router.createUrlTree(['/']));
+  if (auth.canBrowse()) {
+    return of(true);
   }
 
   return auth.refresh().pipe(
-    map(() => router.createUrlTree(['/'])),
-    catchError(() => of(true)),
+    map(() => true),
+    catchError(() => of(router.createUrlTree(['/login']))),
   );
 };

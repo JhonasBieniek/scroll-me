@@ -43,6 +43,8 @@ export class ShellState {
   readonly profileReturnContext = signal<ProfileReturnContext>(null);
   readonly pendingCommentsPostId = signal<string | null>(null);
   readonly editProfileOpen = signal(false);
+  readonly loginPromptOpen = signal(false);
+  readonly loginPromptAction = signal<string | null>(null);
   readonly profileReloadTick = signal(0);
   readonly feedReloadTick = signal(0);
   readonly pendingVideoFile = signal<File | null>(null);
@@ -154,5 +156,15 @@ export class ShellState {
 
   closeEditProfile(): void {
     this.editProfileOpen.set(false);
+  }
+
+  openLoginPrompt(action: string): void {
+    this.loginPromptAction.set(action);
+    this.loginPromptOpen.set(true);
+  }
+
+  closeLoginPrompt(): void {
+    this.loginPromptOpen.set(false);
+    this.loginPromptAction.set(null);
   }
 }

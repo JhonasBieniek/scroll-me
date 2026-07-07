@@ -13,6 +13,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { AuthService } from '../../core/auth/auth.service';
 import { PostsService } from '../../core/posts/posts.service';
 import { PostSummary } from '../../core/posts/posts.models';
 import { PlaybackResumeService } from '../../core/playback/playback-resume.service';
@@ -34,6 +35,7 @@ type FeedPhase = 'following' | 'discover';
 })
 export class FeedComponent implements AfterViewInit, OnDestroy {
   private readonly postsService = inject(PostsService);
+  private readonly auth = inject(AuthService);
   protected readonly shell = inject(ShellState);
   private readonly playbackResume = inject(PlaybackResumeService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -48,7 +50,7 @@ export class FeedComponent implements AfterViewInit, OnDestroy {
   suggestionsIndex = -1;
 
   private observer: IntersectionObserver | null = null;
-  private phase: FeedPhase = 'following';
+  private phase: FeedPhase = this.auth.isAuthenticated() ? 'following' : 'discover';
   private cursor: string | null = null;
   private endReached = false;
   private loadInFlight = false;
@@ -186,7 +188,7 @@ export class FeedComponent implements AfterViewInit, OnDestroy {
     this.posts = [];
     this.activeIndex = 0;
     this.suggestionsIndex = -1;
-    this.phase = 'following';
+    this.phase = this.auth.isAuthenticated() ? 'following' : 'discover';
     this.cursor = null;
     this.endReached = false;
     this.loadInFlight = false;

@@ -6,8 +6,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalCurrentUser } from '../auth/decorators/optional-current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/jwt-payload';
 import {
   mapPostsToResponse,
@@ -16,13 +17,13 @@ import {
 import { StorageService } from '../storage/storage.service';
 import { FeedQueryDto } from './dto/feed-query.dto';
 import { FeedService } from './feed.service';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 interface FeedResponse {
   items: PostResponse[];
   nextCursor: string | null;
 }
 
-@UseGuards(JwtAuthGuard)
 @Controller('feed')
 export class FeedController {
   constructor(
@@ -30,6 +31,7 @@ export class FeedController {
     private readonly storage: StorageService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('following')
   @HttpCode(HttpStatus.OK)
   async following(
@@ -43,13 +45,14 @@ export class FeedController {
     };
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('discover')
   @HttpCode(HttpStatus.OK)
   async discover(
     @Query() query: FeedQueryDto,
-    @CurrentUser() user: AuthenticatedUser,
+    @OptionalCurrentUser() user: AuthenticatedUser | null,
   ): Promise<FeedResponse> {
-    const page = await this.feed.discover(user.id, query);
+    const page = await this.feed.discover(user?.id, query);
     return {
       items: await mapPostsToResponse(page.items, this.storage),
       nextCursor: page.nextCursor,

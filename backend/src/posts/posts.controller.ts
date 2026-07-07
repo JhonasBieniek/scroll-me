@@ -20,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/jwt-payload';
 import { StorageService } from '../storage/storage.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -39,7 +40,6 @@ interface ThumbnailResponse {
   expiresIn: number;
 }
 
-@UseGuards(JwtAuthGuard)
 @Controller('posts')
 export class PostsController {
   private readonly logger = new Logger(PostsController.name);
@@ -50,6 +50,7 @@ export class PostsController {
     private readonly storage: StorageService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @HttpPost('upload')
   @HttpCode(HttpStatus.CREATED)
@@ -88,6 +89,7 @@ export class PostsController {
     return mapPostToResponse(withMeta, this.storage);
   }
 
+  @UseGuards(JwtAuthGuard)
   @HttpPost(':id/like')
   @HttpCode(HttpStatus.NO_CONTENT)
   async like(
@@ -97,6 +99,7 @@ export class PostsController {
     await this.posts.like(id, user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id/like')
   @HttpCode(HttpStatus.NO_CONTENT)
   async unlike(
@@ -106,6 +109,7 @@ export class PostsController {
     await this.posts.unlike(id, user.id);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id/manifest')
   @HttpCode(HttpStatus.OK)
   async manifest(
@@ -118,6 +122,7 @@ export class PostsController {
     return { playlist, expiresIn: this.storage.presignTtlSeconds };
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id/thumbnail')
   @HttpCode(HttpStatus.OK)
   async thumbnail(
@@ -131,6 +136,7 @@ export class PostsController {
     return { url, expiresIn: this.storage.presignTtlSeconds };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(

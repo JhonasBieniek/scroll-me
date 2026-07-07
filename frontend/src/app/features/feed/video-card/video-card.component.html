@@ -169,22 +169,33 @@
           }
         </ul>
 
-        <form class="comments__form" (submit)="$event.preventDefault(); submitComment()">
-          <input
-            class="comments__input"
-            type="text"
-            maxlength="500"
-            placeholder="Adicione um comentário..."
-            [(ngModel)]="commentDraft"
-            name="commentDraft"
-          />
-          <button
-            type="submit"
-            class="comments__send"
-            [disabled]="!commentDraft.trim() || commentSubmitting"
-          >
-            Publicar
-          </button>
+        <form
+          class="comments__form"
+          (submit)="$event.preventDefault(); submitComment()"
+        >
+          @if (auth.isAuthenticated()) {
+            <input
+              class="comments__input"
+              type="text"
+              maxlength="500"
+              placeholder="Adicione um comentário..."
+              [(ngModel)]="commentDraft"
+              name="commentDraft"
+            />
+            <button
+              type="submit"
+              class="comments__send"
+              [disabled]="!commentDraft.trim() || commentSubmitting"
+            >
+              Publicar
+            </button>
+          } @else {
+            <p class="comments__guest">
+              <button type="button" class="comments__guest-link" (click)="auth.requireAuth('comment')">
+                Entre para comentar
+              </button>
+            </p>
+          }
         </form>
       </section>
     </div>
